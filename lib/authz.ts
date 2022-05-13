@@ -1,8 +1,7 @@
+import { ADMIN_SESS_MAXAGE } from './consts';
 import { Session } from './session';
 import { RequestHandler } from './types';
 
-
-const ADMIN_SESS_MAXAGE = 300000; // 5 minutes
 
 export function checkAdmin(session: Session): boolean {
   const { adminSessionStart } = session;
