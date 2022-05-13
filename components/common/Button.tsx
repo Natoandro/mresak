@@ -1,9 +1,12 @@
 import clsx from 'clsx';
-import { ButtonHTMLAttributes, forwardRef } from 'react';
+import Link, { LinkProps } from 'next/link';
+import { AnchorHTMLAttributes, ButtonHTMLAttributes, forwardRef } from 'react';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface BaseButtonProps {
   variant?: 'contained' | 'outlined';
 }
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, BaseButtonProps { }
 
 export default forwardRef<HTMLButtonElement, ButtonProps>(
   function Button({ variant = 'contained', className, ...props }, ref) {
@@ -13,6 +16,26 @@ export default forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
         ref={ref}
       />
+    );
+  }
+);
+
+interface ButtonLinkProps
+  extends
+  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>,
+  BaseButtonProps,
+  Omit<LinkProps, 'onClick' | 'onMouseEnter'> { }
+
+export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
+  function ButtonLink({ variant = 'contained', className, href, ...props }, ref) {
+    return (
+      <Link href={href}>
+        <a
+          className={clsx(getClassNames(variant), className, 'cursor-pointer')}
+          {...props}
+          ref={ref}
+        />
+      </Link>
     );
   }
 );

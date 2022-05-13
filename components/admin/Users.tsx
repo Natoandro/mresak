@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { UserAttributes } from '~/db/models/users';
-import Button from '../common/Button';
+import { ButtonLink } from '../common/Button';
+import Layout from './Layout';
 
 interface UserListItemProps {
   user: UserAttributes;
@@ -32,23 +33,17 @@ export default function Users() {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col relative">
-      <header className="bg-blue-500 text-white px-4 py-2 flex">
-        <h1 className="text-4xl italic">M&apos;Resak</h1>
-        <h2 className="text-4xl ml-4 opacity-70">Admin</h2>
-      </header>
-      <main className="grow max-w-screen-sm w-full mx-auto">
-        <h3 className="text-3xl bold py-4">User management</h3>
-        <div className="mt-2 mb-4">
-          <Button variant="outlined">New user</Button>
-        </div>
+    <Layout>
+      <h3 className="text-3xl bold py-4">User management</h3>
+      <div className="mt-2 mb-4">
+        <ButtonLink href="/admin/users/new" variant="outlined">New user</ButtonLink>
+      </div>
 
-        <ul>
-          {users && users.map(user => (
-            <UserListItem key={user.login} user={user} />
-          ))}
-        </ul>
-      </main>
-    </div>
+      <ul>
+        {users && users.map(user => (
+          <UserListItem key={user.login} user={user} />
+        ))}
+      </ul>
+    </Layout>
   );
 }
