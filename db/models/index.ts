@@ -1,9 +1,11 @@
 import { Sequelize } from 'sequelize';
 import adminModel from './admin';
 
-const sequelize = new Sequelize('sequelize::memory:');
+const sequelize = new Sequelize(`sqlite:${process.env.SQLITE_DB}`);
 
-export const db = {
+const db = {
   sequelize,
   admin: adminModel(sequelize),
 };
+
+export default db;
