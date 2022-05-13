@@ -28,7 +28,7 @@ const NewUserPage: NextPage = () => {
       <h3 className="text-3xl mt-6 mb-4">Create new user</h3>
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormField
-          label="Login"
+          label="Login" autoFocus
           {...register('login', { required: true })}
         />
         <FormField
