@@ -12,7 +12,7 @@ export default AdminPage;
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session: Session = await getSession(req, res);
-  if (session.admin == null) {
+  if (session.adminSessionStart == null) {
     // not signed as admin
     return {
       redirect: { destination: '/admin/login', permanent: false },

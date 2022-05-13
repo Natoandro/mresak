@@ -9,12 +9,11 @@ export default class SessionStore {
     if (row == null) return null;
     const sessData: SessionData = JSON.parse(row.sess);
     // TODO: check expired
-    console.log('updatedAt: ', row.getDataValue('updatedAt' as unknown as 'sid'));
     return sessData;
   }
 
   async set(sid: string, sessionData: SessionData) {
-    await this.sessions.create({ sid: sid, sess: JSON.stringify(sessionData) });
+    await this.sessions.upsert({ sid: sid, sess: JSON.stringify(sessionData) });
   }
 
   async destroy(sid: string) {

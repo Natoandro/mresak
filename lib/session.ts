@@ -6,8 +6,8 @@ import db from '~/db/models';
 import { NextHandler } from 'next-connect';
 
 export interface SessionData {
-  admin?: number;
-  user?: string;
+  adminSessionStart?: number;
+  username?: string;
 }
 
 export type Session = NextSession & SessionData;

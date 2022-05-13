@@ -67,7 +67,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session: Session = await getSession(req, res);
 
   // signed in as admin
-  if (session.admin != null) {
+  if (session.adminSessionStart != null) {
     return {
       redirect: { destination: '/admin', permanent: false },
     };
