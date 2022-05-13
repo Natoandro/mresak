@@ -1,12 +1,17 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, Sequelize } from 'sequelize';
 
-class Admin extends Model<InferAttributes<Admin>, InferCreationAttributes<Admin>> {
-  declare passwordHash: string;
+class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+  declare login: string;
+  declare name: string;
 }
 
 export default function adminModel(sequelize: Sequelize) {
-  Admin.init({
-    passwordHash: {
+  User.init({
+    login: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     }
@@ -14,7 +19,7 @@ export default function adminModel(sequelize: Sequelize) {
     sequelize,
     freezeTableName: true,
   });
-  return Admin;
+  return User;
 }
 
-export type { Admin };
+export type { User };

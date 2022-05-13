@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import db from '~/db/models';
 import FormField from '~/components/common/FormField';
+import Button from '~/components/common/Button';
 
 interface FieldValues {
   password: string;
@@ -52,7 +53,7 @@ const AdminInit: NextPage = () => {
         />
 
         <div className="flex mt-6">
-          <button className="grow text-white rounded bg-blue-600 py-1">Submit</button>
+          <Button>Submit</Button>
         </div>
       </form>
     </div>
