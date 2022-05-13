@@ -12,7 +12,7 @@ function UserListItem({ user }: UserListItemProps) {
   return (
     <li className="flex border-b first:border-t px-4 py-2 flex flex-col">
       <span>{user.name}</span>
-      <span className="text-gray-500 text-sm">{user.login}</span>
+      <span className="text-gray-500 text-sm">@{user.login}</span>
     </li>
   );
 }
