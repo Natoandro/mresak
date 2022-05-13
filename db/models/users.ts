@@ -1,11 +1,17 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, Sequelize } from 'sequelize';
 
-class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+interface UserAttributes {
+  login: string;
+  name: string;
+}
+
+class User extends Model<InferAttributes<User>, InferCreationAttributes<User>>
+  implements UserAttributes {
   declare login: string;
   declare name: string;
 }
 
-export default function adminModel(sequelize: Sequelize) {
+export default function usersModel(sequelize: Sequelize) {
   User.init({
     login: {
       type: DataTypes.STRING,
@@ -17,9 +23,8 @@ export default function adminModel(sequelize: Sequelize) {
     }
   }, {
     sequelize,
-    freezeTableName: true,
   });
   return User;
 }
 
-export type { User };
+export type { User, UserAttributes };

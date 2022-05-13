@@ -1,19 +1,21 @@
 import axios from 'axios';
-import { useState } from 'react';
+import type { NextPage, GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-import Button from '../common/Button';
-import FormField from '../common/FormField';
+import db from '~/db/models';
+import FormField from '~/components/common/FormField';
+import Button from '~/components/common/Button';
+import { useState } from 'react';
+import { getSession, Session } from '~/lib/session';
 
 
 interface FieldValues {
   password: string;
 }
 
-interface AdminLoginFormProps {
-  onAuth: () => void;
-}
+const AdminLogin: NextPage = () => {
+  const router = useRouter();
 
-export default function AdminLoginForm({ onAuth }: AdminLoginFormProps) {
   const { register, handleSubmit, watch } = useForm<FieldValues>();
   const password = watch('password', '');
 
@@ -22,7 +24,7 @@ export default function AdminLoginForm({ onAuth }: AdminLoginFormProps) {
   const onSubmit = async (data: FieldValues) => {
     try {
       await axios.post('/api/admin/login', data);
-      onAuth();
+      await router.replace('/admin');
     } catch (err) {
       setPasswordIsInvalid(true);
     }
@@ -46,9 +48,39 @@ export default function AdminLoginForm({ onAuth }: AdminLoginFormProps) {
         />
 
         <div className="flex mt-6">
-          <Button disabled={password == ''}>Log In</Button>
+          <Button className="grow" disabled={password == ''}>Log In</Button>
         </div>
       </form>
     </div>
   );
+};
+
+export default AdminLogin;
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session: Session = await getSession(req, res);
+
+  // signed in as admin
+  if (session.admin != null) {
+    return {
+      redirect: { destination: '/admin', permanent: false, },
+    };
+  }
+
+  const admin = await db.admin.findOne();
+
+  if (admin == null) {
+    // first run
+    return {
+      redirect: {
+        destination: '/admin/init',
+        permanent: false,
+      }
+    };
+  }
+
+  // not first run --> login page
+  return {
+    props: {}
+  };
 };

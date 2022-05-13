@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import db from '~/db/models';
 import FormField from '~/components/common/FormField';
 import Button from '~/components/common/Button';
+import { getSession, Session } from '~/lib/session';
 
 interface FieldValues {
   password: string;
@@ -19,7 +20,7 @@ const AdminInit: NextPage = () => {
   const onSubmit = async (data: FieldValues) => {
     const { password } = data;
     await axios.post('/api/admin/init', { password });
-    await router.replace('/');
+    await router.replace('/admin');
   };
 
   const getConfirmHelperText = () => {
@@ -62,21 +63,26 @@ const AdminInit: NextPage = () => {
 
 export default AdminInit;
 
-let dbSynced = false;
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session: Session = await getSession(req, res);
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const admin = await db.admin.findOne();
-
-  if (admin != null) {
-    // not first run
+  // signed in as admin
+  if (session.admin != null) {
     return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      }
+      redirect: { destination: '/admin', permanent: false },
     };
   }
 
+  const admin = await db.admin.findOne();
+
+  if (admin != null) {
+    // not first run --> login page
+    return {
+      redirect: { destination: '/admin/login', permanent: false },
+    };
+  }
+
+  // first run --> init
   return {
     props: {}
   };

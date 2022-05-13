@@ -1,35 +1,21 @@
-import axios from 'axios';
-import type { NextPage, GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
-import db from '~/db/models';
-import FormField from '~/components/common/FormField';
-import Button from '~/components/common/Button';
-import AdminLoginForm from '~/components/admin/LoginForm';
-import { useState } from 'react';
+import { GetServerSideProps, NextPage } from 'next';
+import Users from '~/components/admin/Users';
+import { getSession, Session } from '~/lib/session';
 
-// rendered on first run
-const AdminIndex: NextPage = () => {
-  const [authenticated, setAuthenticated] = useState(false);
-
-  if (!authenticated) {
-    return (<AdminLoginForm onAuth={() => setAuthenticated(true)} />);
-  }
-  return <p>Admin</p>;
+const AdminPage: NextPage = () => {
+  return (
+    <Users />
+  );
 };
 
-export default AdminIndex;
+export default AdminPage;
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const admin = await db.admin.findOne();
-
-  if (admin == null) {
-    // first run
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session: Session = await getSession(req, res);
+  if (session.admin == null) {
+    // not signed as admin
     return {
-      redirect: {
-        destination: '/admin/init',
-        permanent: false,
-      }
+      redirect: { destination: '/admin/login', permanent: false },
     };
   }
 
