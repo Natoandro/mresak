@@ -5,11 +5,16 @@ export default class SessionStore {
   constructor(private sessions: typeof Session) { }
 
   async get(sid: string): Promise<SessionData | null> {
-    const row = await this.sessions.findOne({ where: { sid } });
-    if (row == null) return null;
-    const sessData: SessionData = JSON.parse(row.sess);
-    // TODO: check expired
-    return sessData;
+    try {
+      const row = await this.sessions.findOne({ where: { sid } });
+      if (row == null) return null;
+      const sessData: SessionData = JSON.parse(row.sess);
+      // TODO: check expired
+      return sessData;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
   }
 
   async set(sid: string, sessionData: SessionData) {

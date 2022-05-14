@@ -10,7 +10,7 @@ interface BaseButtonProps {
   white?: boolean;
 }
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, BaseButtonProps { }
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, BaseButtonProps { }
 
 export default forwardRef<HTMLButtonElement, ButtonProps>(
   function Button({ variant = 'contained', white = false, className, ...props }, ref) {

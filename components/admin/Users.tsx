@@ -1,29 +1,32 @@
 import axios from 'axios';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { UserAttributes } from '~/db/models/users';
+import { RUserAttributes, UserAttributes } from '~/db/models/users';
 import { ButtonLink } from '../common/Button';
 import Layout from './Layout';
 
 interface UserListItemProps {
-  user: UserAttributes;
+  user: RUserAttributes;
 }
 
 function UserListItem({ user }: UserListItemProps) {
   return (
-    <li className="flex border-b first:border-t px-4 py-2 flex flex-col">
-      <span>{user.name}</span>
-      <span className="text-gray-500 text-sm">@{user.login}</span>
-    </li>
+    <Link href={`/admin/users/${user.id}`}>
+      <li className="flex border-b first:border-t px-4 py-2 flex flex-col hover:bg-slate-100 cursor-pointer">
+        <span>{user.name}</span>
+        <span className="text-gray-500 text-sm">@{user.login}</span>
+      </li>
+    </Link>
   );
 }
 
 export default function Users() {
   console.log('render');
-  const [users, setUsers] = useState<UserAttributes[] | null>(null);
+  const [users, setUsers] = useState<RUserAttributes[] | null>(null);
 
   useEffect(() => {
     // TODO: security: cookie auth
-    axios.get<UserAttributes[]>('/api/admin/users')
+    axios.get<RUserAttributes[]>('/api/admin/users')
       .then(res => {
         setUsers(res.data);
       })

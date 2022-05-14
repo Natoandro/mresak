@@ -1,9 +1,12 @@
 import axios from 'axios';
+import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import { PropsWithChildren } from 'react';
 import Button from '../common/Button';
 
-export default function Layout({ children }: PropsWithChildren<{}>) {
+type LayoutProps = PropsWithChildren<{ className?: string; }>;
+
+export default function Layout({ children, className }: LayoutProps) {
   const router = useRouter();
 
   const onCloseAdminSession = async () => {
@@ -24,7 +27,7 @@ export default function Layout({ children }: PropsWithChildren<{}>) {
           Close admin session
         </Button>
       </header>
-      <main className="grow max-w-screen-sm w-full mx-auto">
+      <main className={clsx('grow max-w-screen-sm w-full mx-auto', className)}>
         {children}
       </main>
     </div>

@@ -4,13 +4,19 @@ interface UserAttributes {
   id?: number;
   login: string;
   name: string;
+  passwordHash: string;
+  passwordResetRequired: boolean;
 }
+
+type RUserAttributes = Required<UserAttributes>;
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>>
   implements UserAttributes {
   declare id?: number;
   declare login: string;
   declare name: string;
+  declare passwordHash: string;
+  declare passwordResetRequired: boolean;
 }
 
 export default function usersModel(sequelize: Sequelize) {
@@ -28,6 +34,14 @@ export default function usersModel(sequelize: Sequelize) {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    passwordHash: {
+      type: DataTypes.STRING,
+    },
+    passwordResetRequired: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
     }
   }, {
     sequelize,
@@ -35,4 +49,4 @@ export default function usersModel(sequelize: Sequelize) {
   return User;
 }
 
-export type { User, UserAttributes };
+export type { User, UserAttributes, RUserAttributes };
