@@ -1,7 +1,10 @@
 import axios from 'axios';
 import type { NextPage, GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
+import { Fragment, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import Layout from '~/components/chat/Layout';
+import UserSearchDialog from '~/components/users/UserSearchDialog';
 import db from '~/db/models';
 import { getSession, Session } from '~/lib/session';
 import FormField from '../components/common/FormField';
@@ -12,8 +15,30 @@ interface FieldValues {
 }
 
 const Home: NextPage = () => {
+  const [userSearchIsOpen, setUserSearchIsOpen] = useState(false);
+
   return (
-    <p>Home</p>
+    <Layout
+      actions={
+        <Fragment>
+          <button
+            className="w-10 h-10 rounded-full hover:bg-blue-50 flex items-center justify-center opacity-80 hover:opacity-100 active:bg-blue-100"
+            title="New message"
+            onClick={() => setUserSearchIsOpen(true)}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" className="fill-blue-500">
+              <path d="M0,24 h24 v-2 h-24 z M4,18h3l12,-12l-3,-3l-12,12z" />
+            </svg>
+          </button>
+          <UserSearchDialog
+            open={userSearchIsOpen} onClose={() => setUserSearchIsOpen(false)}
+            title="Select recipient"
+          />
+        </Fragment>
+      }
+    >
+      <p>Home</p>
+    </Layout>
   );
 };
 
