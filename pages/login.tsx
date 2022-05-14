@@ -13,6 +13,10 @@ interface FieldValues {
   password: string;
 }
 
+interface LoginResult {
+  passwordResetRequired: boolean;
+}
+
 const LoginPage: NextPage = () => {
   const router = useRouter();
 
@@ -21,11 +25,16 @@ const LoginPage: NextPage = () => {
   const [passwordIsInvalid, setPasswordIsInvalid] = useState(false);
   const onSubmit = async (data: FieldValues) => {
     try {
-      await axios.post('/api/login', data);
+      const res = await axios.post<LoginResult>('/api/login', data);
+      const { passwordResetRequired } = res.data;
+      if (passwordResetRequired) {
+        await router.replace('/me/password-reset');
+      } else {
+        await router.replace('/');
+      }
     } catch (err) {
       setPasswordIsInvalid(true);
     }
-    await router.replace('/');
   };
 
   return (
