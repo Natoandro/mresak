@@ -1,24 +1,10 @@
 import axios from 'axios';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { RUserAttributes, UserAttributes } from '~/db/models/users';
+import { RUserAttributes } from '~/db/models/users';
 import { ButtonLink } from '../common/Button';
+import UserListItem from '../users/UserListItem';
 import Layout from './Layout';
-
-interface UserListItemProps {
-  user: RUserAttributes;
-}
-
-function UserListItem({ user }: UserListItemProps) {
-  return (
-    <Link href={`/admin/users/${user.id}`}>
-      <li className="flex border-b first:border-t px-4 py-2 flex flex-col hover:bg-slate-100 cursor-pointer">
-        <span>{user.name}</span>
-        <span className="text-gray-500 text-sm">@{user.login}</span>
-      </li>
-    </Link>
-  );
-}
 
 export default function Users() {
   console.log('render');
@@ -44,7 +30,12 @@ export default function Users() {
 
       <ul>
         {users && users.map(user => (
-          <UserListItem key={user.login} user={user} />
+          <Link key={user.login} href={`/admin/users/${user.id}`}>
+            <UserListItem
+              user={user}
+              className="border-b first:border-t hover:bg-slate-100 cursor-pointer"
+            />
+          </Link>
         ))}
       </ul>
     </Layout>

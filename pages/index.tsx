@@ -33,6 +33,7 @@ const Home: NextPage = () => {
           <UserSearchDialog
             open={userSearchIsOpen} onClose={() => setUserSearchIsOpen(false)}
             title="Select recipient"
+            onSelect={() => setUserSearchIsOpen(false)}
           />
         </Fragment>
       }
