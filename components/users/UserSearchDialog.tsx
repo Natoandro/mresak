@@ -17,39 +17,36 @@ interface UserSearchDialogProps {
 export default function UserSearchDialog(
   { title, open, onClose, onSelect }: UserSearchDialogProps
 ) {
+  // Store the current value of `searchQuery` in `searchQueryRef`.
+  // Request completion only triggers update for the latest search.
+
+  const [searchQuery, setSearchQuery] = useState('');
   const [match, setMatch] = useState<RUserAttributes[] | null>(null);
-  const [changeId, setChangeId] = useState(0);
-  const changeIdRef = useRef(0);
-
-  useEffect(() => {
-    changeIdRef.current = changeId;
-  });
-
+  const searchQueryRef = useRef('');
   const [isPending, startTransition] = useTransition();
 
-  const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const q = e.target.value;
-    if (q === '' || q === '@') {
-      startTransition(() => {
-        setMatch(null);
-        setChangeId(n => n + 1);
-      });
+  useEffect(() => {
+    searchQueryRef.current = searchQuery;
+  });
+
+  useEffect(() => {
+    if (searchQuery === '' || searchQuery === '@') {
+      startTransition(() => setMatch(null));
+      return;
     }
 
-    const usp = new URLSearchParams({ q });
-    const res = await axios.get<RUserAttributes[]>(`/api/users/search?${usp.toString()}`);
-    if (changeId === changeIdRef.current) {
-      startTransition(() => {
-        setMatch(res.data);
-        setChangeId(n => n + 1);
-      });
-    }
-  };
+    const usp = new URLSearchParams({ q: searchQuery });
+    axios.get<RUserAttributes[]>(`/api/users/search?${usp.toString()}`).then(res => {
+      if (searchQuery === searchQueryRef.current) {
+        startTransition(() => setMatch(res.data));
+      }
+    });
+  }, [searchQuery]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (open) {
-      inputRef.current!.value = '';
+      setSearchQuery('');
       inputRef.current?.focus();
     }
   }, [open]);
@@ -73,7 +70,8 @@ export default function UserSearchDialog(
             placeholder="Search user" autoFocus
             startIcon={({ focus }) => <SearchIcon className={clsx(focus || 'opacity-50')} />}
             helperText="Type 'John Doe' or '@johndoe'"
-            onChange={handleChange}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             ref={inputRef}
           />
 
