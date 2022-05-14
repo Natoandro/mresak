@@ -24,3 +24,14 @@ export const requireAdminMiddleware: RequestHandler = (req, res, next) => {
   }
 };
 
+
+export const requireUser: RequestHandler = (req, res, next) => {
+  if (req.session?.username) {
+    next();
+  } else {
+    res.status(403).json({
+      error: 'authentication required',
+    });
+  }
+};
+

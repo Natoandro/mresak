@@ -22,6 +22,7 @@ const LoginPage: NextPage = () => {
 
   const { register, handleSubmit, watch } = useForm<FieldValues>();
 
+  // TODO: handle invalid password
   const [passwordIsInvalid, setPasswordIsInvalid] = useState(false);
   const onSubmit = async (data: FieldValues) => {
     try {
