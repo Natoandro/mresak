@@ -3,6 +3,7 @@ import type { NextPage, GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import db from '~/db/models';
+import { getSession, Session } from '~/lib/session';
 import FormField from '../components/common/FormField';
 
 interface FieldValues {
@@ -20,7 +21,16 @@ export default Home;
 
 let dbSynced = false;
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session: Session = await getSession(req, res);
+  if (session.username) {
+    // logged in
+    // TODO: list chat threads
+    return {
+      props: {},
+    };
+  }
+
   if (!dbSynced) {
     await db.sequelize.sync();
     dbSynced = true;
@@ -39,6 +49,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
   }
 
   return {
-    props: {}
+    redirect: { destination: '/login', permanent: false, },
   };
 };

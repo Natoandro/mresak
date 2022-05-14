@@ -24,10 +24,10 @@ const AdminLogin: NextPage = () => {
   const onSubmit = async (data: FieldValues) => {
     try {
       await axios.post('/api/admin/login', data);
-      await router.replace('/admin');
     } catch (err) {
       setPasswordIsInvalid(true);
     }
+    await router.replace('/admin');
   };
 
   const getHelperText = () => {
