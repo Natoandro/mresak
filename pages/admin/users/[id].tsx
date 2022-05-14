@@ -5,6 +5,7 @@ import { ParsedUrlQuery } from 'querystring';
 import { useState } from 'react';
 import Layout from '~/components/admin/Layout';
 import Button, { ButtonProps } from '~/components/common/Button';
+import Avatar from '~/components/users/Avatar';
 import db from '~/db/models';
 import { RUserAttributes } from '~/db/models/users';
 import { checkAdmin } from '~/lib/authz';
@@ -47,7 +48,7 @@ const UserPage: NextPage<UserPageProps> = ({ user }) => {
           >Close</button>
         </div>
       )}
-      <svg width={200} height={200} className="bg-slate-400 rounded-full inline mb-4"></svg><br />
+      <Avatar name={user.name} big className="mb-4" />
       <p className="text-2xl">{user.name}</p>
       <p className="text-xl text-gray-500">@{user.login}</p>
       <div className="my-4">

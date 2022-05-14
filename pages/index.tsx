@@ -6,15 +6,17 @@ import { useForm } from 'react-hook-form';
 import Layout from '~/components/chat/Layout';
 import UserSearchDialog from '~/components/users/UserSearchDialog';
 import db from '~/db/models';
+import { RUserAttributes } from '~/db/models/users';
+import { toPlainObject } from '~/lib/model';
 import { getSession, Session } from '~/lib/session';
 import FormField from '../components/common/FormField';
 
-interface FieldValues {
-  password: string;
-  passwordConfirm: string;
+
+interface HomePageProps {
+  currentUser: RUserAttributes;
 }
 
-const Home: NextPage = () => {
+const HomePage: NextPage<HomePageProps> = ({ currentUser }) => {
   const [userSearchIsOpen, setUserSearchIsOpen] = useState(false);
 
   return (
@@ -37,13 +39,14 @@ const Home: NextPage = () => {
           />
         </Fragment>
       }
+      currentUser={currentUser}
     >
       <p>Home</p>
     </Layout>
   );
 };
 
-export default Home;
+export default HomePage;
 
 let dbSynced = false;
 
@@ -52,8 +55,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   if (session.username) {
     // logged in
     // TODO: list chat threads
+    const currentUser = await db.users.findOne({ where: { login: session.username } });
+    if (currentUser == null) {
+      return { notFound: true }; //! TODO: end current session
+    }
+
     return {
-      props: {},
+      props: {
+        currentUser: toPlainObject(currentUser),
+      },
     };
   }
 
