@@ -33,7 +33,7 @@ export default function Users() {
           <Link key={user.login} href={`/admin/users/${user.id}`}>
             <UserListItem
               user={user}
-              className="border-b first:border-t hover:bg-slate-100 cursor-pointer"
+              className="hover:bg-slate-100 cursor-pointer"
             />
           </Link>
         ))}

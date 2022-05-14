@@ -79,11 +79,11 @@ export default function UserSearchDialog(
 
           {match != null
             ? (
-              <ul className="overflow-y-auto grow-0 p-1 space-y-4">
+              <ul className="overflow-y-auto grow-0 p-1">
                 {match.map(user => (
                   <UserListItem
                     key={user.id} user={user}
-                    className="border-slate-200 rounded-md shadow-z1 cursor-default hover:bg-gray-100"
+                    className="border-slate-200 rounded-full cursor-default hover:bg-gray-100"
                     onClick={() => onSelect(user)}
                   />
                 ))}
