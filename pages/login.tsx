@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Button from '~/components/common/Button';
+import FormCard from '~/components/common/FormCard';
 import FormField from '~/components/common/FormField';
 
 
@@ -21,6 +22,8 @@ const LoginPage: NextPage = () => {
   const router = useRouter();
 
   const { register, handleSubmit, watch } = useForm<FieldValues>();
+  const login = watch('login');
+  const password = watch('password');
 
   // TODO: handle invalid password
   const [passwordIsInvalid, setPasswordIsInvalid] = useState(false);
@@ -38,8 +41,17 @@ const LoginPage: NextPage = () => {
     }
   };
 
+  const getHelperText = () => {
+    if (!passwordIsInvalid) return;
+    return 'Password is invalid.';
+  };
+
+  useEffect(() => {
+    setPasswordIsInvalid(false);
+  }, [password, setPasswordIsInvalid]);
+
   return (
-    <div className="max-w-sm mx-auto my-10 p-4 border shadow-md rounded">
+    <FormCard>
       <h1 className="text-3xl my-2">Log In</h1>
       <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
         <FormField
@@ -49,14 +61,16 @@ const LoginPage: NextPage = () => {
         <FormField
           type="password"
           label="Password"
+          error={passwordIsInvalid}
+          helperText={getHelperText()}
           {...register('password', { required: true, })}
         />
 
         <div className="flex mt-6">
-          <Button className="grow">Log in</Button>
+          <Button className="grow" disabled={!password || !login}>Log in</Button>
         </div>
       </form>
-    </div>
+    </FormCard>
   );
 };
 
