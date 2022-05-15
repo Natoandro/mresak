@@ -26,7 +26,7 @@ export const requireAdminMiddleware: RequestHandler = (req, res, next) => {
 
 
 export const requireUser: RequestHandler = (req, res, next) => {
-  if (req.session?.username) {
+  if (req.session?.userId != null) {
     next();
   } else {
     res.status(403).json({

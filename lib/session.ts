@@ -7,7 +7,7 @@ import { NextHandler } from 'next-connect';
 
 export interface SessionData {
   adminSessionStart?: number;
-  username?: string;
+  userId?: number;
 }
 
 export type Session = NextSession & SessionData;

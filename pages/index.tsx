@@ -70,10 +70,10 @@ let dbSynced = false;
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session: Session = await getSession(req, res);
-  if (session.username) {
+  if (session.userId != null) {
     // logged in
     // TODO: list chat threads
-    const currentUser = await db.users.findOne({ where: { login: session.username } });
+    const currentUser = await db.users.findByPk(session.userId);
     if (currentUser == null) {
       return { notFound: true }; //! TODO: end current session
     }

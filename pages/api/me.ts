@@ -19,12 +19,12 @@ export default nextConnect<ApiRequest, NextApiResponse>()
   .use(requireUser)
 
   .patch<PatchReqExt>(async (req, res) => {
-    const username = req.session.username;
+    const userId = req.session.userId!;
 
     const { patch } = req.body;
     if (patch === 'password') {
       const { from, to } = req.body;
-      const user = await db.users.findOne({ where: { login: username } });
+      const user = await db.users.findByPk(userId);
 
       const ok = await bcrypt.compare(from, user!.passwordHash);
       if (!ok) {

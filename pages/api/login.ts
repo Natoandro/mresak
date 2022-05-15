@@ -27,7 +27,7 @@ handler.post<PostReqExt>(async (req, res) => {
   const ok = await bcrypt.compare(password, user.passwordHash);
   if (ok) {
     const { passwordResetRequired } = user;
-    req.session.username = login;
+    req.session.userId = user.id;
     res.status(200).json({ passwordResetRequired });
   } else {
     res.status(403).json({
