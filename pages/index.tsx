@@ -8,22 +8,22 @@ import Messages from '~/components/chat/Messages';
 import UserListItem from '~/components/users/UserListItem';
 import UserSearchDialog from '~/components/users/UserSearchDialog';
 import db from '~/db/models';
-import { RUserAttributes } from '~/db/models/users';
+import { UserAttributes } from '~/db/models/users';
 import { toPlainObject } from '~/lib/model';
 import { getSession, Session } from '~/lib/session';
 import FormField from '../components/common/FormField';
 
 
 interface HomePageProps {
-  currentUser: RUserAttributes;
+  currentUser: UserAttributes;
 }
 
 const HomePage: NextPage<HomePageProps> = ({ currentUser }) => {
   const [userSearchIsOpen, setUserSearchIsOpen] = useState(false);
-  const [activeThread, setActiveThread] = useState<RUserAttributes | null>(null);
-  const [newThread, setNewThread] = useState<RUserAttributes | null>(null);
+  const [activeThread, setActiveThread] = useState<UserAttributes | null>(null);
+  const [newThread, setNewThread] = useState<UserAttributes | null>(null);
 
-  const handleRecipientSelect = (user: RUserAttributes) => {
+  const handleRecipientSelect = (user: UserAttributes) => {
     setUserSearchIsOpen(false);
     setNewThread(user);
     setActiveThread(user);

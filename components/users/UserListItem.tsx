@@ -1,10 +1,10 @@
 import clsx from 'clsx';
 import { LiHTMLAttributes } from 'react';
-import { RUserAttributes } from '~/db/models/users';
+import { UserAttributes } from '~/db/models/users';
 import Avatar from './Avatar';
 
 interface UserListItemProps extends LiHTMLAttributes<HTMLLIElement> {
-  user: RUserAttributes;
+  user: UserAttributes;
   oneLine?: boolean;
 }
 

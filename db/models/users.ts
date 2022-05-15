@@ -1,22 +1,22 @@
-import { DataTypes, Model, InferAttributes, InferCreationAttributes, Sequelize } from 'sequelize';
+import { DataTypes, Model, Sequelize, Optional } from 'sequelize';
 
-interface UserAttributes {
-  id?: number;
+export interface UserAttributes {
+  id: number;
   login: string;
   name: string;
   passwordHash: string;
   passwordResetRequired: boolean;
 }
 
-type RUserAttributes = Required<UserAttributes>;
+export interface UserCreationAttributes extends Optional<UserAttributes, 'id'> { }
 
-class User extends Model<InferAttributes<User>, InferCreationAttributes<User>>
+export class User extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes {
-  declare id?: number;
-  declare login: string;
-  declare name: string;
-  declare passwordHash: string;
-  declare passwordResetRequired: boolean;
+  public id!: number;
+  public login!: string;
+  public name!: string;
+  public passwordHash!: string;
+  public passwordResetRequired!: boolean;
 }
 
 export default function usersModel(sequelize: Sequelize) {
@@ -48,5 +48,3 @@ export default function usersModel(sequelize: Sequelize) {
   });
   return User;
 }
-
-export type { User, UserAttributes, RUserAttributes };

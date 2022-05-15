@@ -1,7 +1,7 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, Sequelize } from 'sequelize';
 
-class Admin extends Model<InferAttributes<Admin>, InferCreationAttributes<Admin>> {
-  declare passwordHash: string;
+export class Admin extends Model<InferAttributes<Admin>, InferCreationAttributes<Admin>> {
+  public passwordHash!: string;
 }
 
 export default function adminModel(sequelize: Sequelize) {
@@ -16,5 +16,3 @@ export default function adminModel(sequelize: Sequelize) {
   });
   return Admin;
 }
-
-export type { Admin };

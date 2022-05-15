@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { RUserAttributes } from '~/db/models/users';
+import { UserAttributes } from '~/db/models/users';
 import MessageView from './MessageView';
 import MessageInput from './MessageInput';
 
 interface MessagesProps {
-  currentUser: RUserAttributes;
-  interlocutor: RUserAttributes; // the other member of the current thread
+  currentUser: UserAttributes;
+  interlocutor: UserAttributes; // the other member of the current thread
 }
 
 

@@ -3,8 +3,8 @@ import { Model, InferAttributes, InferCreationAttributes, Sequelize, DataTypes }
 class Session
   extends Model<InferAttributes<Session>, InferCreationAttributes<Session>>
 {
-  declare sid: string;
-  declare sess: string;
+  public sid!: string;
+  public sess!: string;
 }
 
 export default function sessionsModel(sequelize: Sequelize) {

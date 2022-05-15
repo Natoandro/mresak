@@ -1,18 +1,18 @@
 import axios from 'axios';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { RUserAttributes } from '~/db/models/users';
+import { UserAttributes } from '~/db/models/users';
 import { ButtonLink } from '../common/Button';
 import UserListItem from '../users/UserListItem';
 import Layout from './Layout';
 
 export default function Users() {
   console.log('render');
-  const [users, setUsers] = useState<RUserAttributes[] | null>(null);
+  const [users, setUsers] = useState<UserAttributes[] | null>(null);
 
   useEffect(() => {
     // TODO: security: cookie auth
-    axios.get<RUserAttributes[]>('/api/admin/users')
+    axios.get<UserAttributes[]>('/api/admin/users')
       .then(res => {
         setUsers(res.data);
       })

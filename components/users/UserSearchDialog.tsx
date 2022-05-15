@@ -1,7 +1,7 @@
 import axios from 'axios';
 import clsx from 'clsx';
 import { ChangeEvent, forwardRef, MouseEvent, useEffect, useRef, useState, useTransition } from 'react';
-import { RUserAttributes } from '~/db/models/users';
+import { UserAttributes } from '~/db/models/users';
 import SearchIcon from '~/icons/search';
 import FormField from '../common/FormField';
 import UserListItem from './UserListItem';
@@ -11,7 +11,7 @@ interface UserSearchDialogProps {
   title: string;
   open: boolean;
   onClose: () => void;
-  onSelect: (user: RUserAttributes) => void;
+  onSelect: (user: UserAttributes) => void;
 }
 
 export default function UserSearchDialog(
@@ -21,7 +21,7 @@ export default function UserSearchDialog(
   // Request completion only triggers update for the latest search.
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [match, setMatch] = useState<RUserAttributes[] | null>(null);
+  const [match, setMatch] = useState<UserAttributes[] | null>(null);
   const searchQueryRef = useRef('');
   const [isPending, startTransition] = useTransition();
 
@@ -36,7 +36,7 @@ export default function UserSearchDialog(
     }
 
     const usp = new URLSearchParams({ q: searchQuery });
-    axios.get<RUserAttributes[]>(`/api/users/search?${usp.toString()}`).then(res => {
+    axios.get<UserAttributes[]>(`/api/users/search?${usp.toString()}`).then(res => {
       if (searchQuery === searchQueryRef.current) {
         startTransition(() => setMatch(res.data));
       }

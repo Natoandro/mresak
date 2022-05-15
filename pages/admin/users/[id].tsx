@@ -7,7 +7,7 @@ import Layout from '~/components/admin/Layout';
 import Button, { ButtonProps } from '~/components/common/Button';
 import Avatar from '~/components/users/Avatar';
 import db from '~/db/models';
-import { RUserAttributes } from '~/db/models/users';
+import { UserAttributes } from '~/db/models/users';
 import { checkAdmin } from '~/lib/authz';
 import { toPlainObject } from '~/lib/model';
 import { getSession } from '~/lib/session';
@@ -17,7 +17,7 @@ const ActionButton = ({ className, ...props }: ButtonProps) => (
 );
 
 interface UserPageProps {
-  user: RUserAttributes;
+  user: UserAttributes;
 }
 
 interface PasswordResetResult {

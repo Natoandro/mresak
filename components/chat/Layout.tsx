@@ -1,13 +1,13 @@
 import clsx from 'clsx';
 import Image from 'next/image';
 import { HTMLAttributes, PropsWithChildren, ReactNode } from 'react';
-import { RUserAttributes } from '~/db/models/users';
+import { UserAttributes } from '~/db/models/users';
 import Avatar from '../users/Avatar';
 import UserListItem from '../users/UserListItem';
 
 export type ChatPageLayoutProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   actions?: ReactNode;
-  currentUser: RUserAttributes;
+  currentUser: UserAttributes;
 }>;
 
 export default function ChatPageLayout(
