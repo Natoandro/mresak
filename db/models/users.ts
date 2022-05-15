@@ -1,31 +1,30 @@
-import { DataTypes, Model, Sequelize, Optional } from 'sequelize';
+import {
+  DataTypes,
+  Model,
+  Sequelize,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional
+} from 'sequelize';
 
-export interface UserAttributes {
-  id: number;
-  login: string;
-  name: string;
-  passwordHash: string;
-  passwordResetRequired: boolean;
-}
-
-export interface UserCreationAttributes extends Optional<UserAttributes, 'id'> { }
-
-export class User extends Model<UserAttributes, UserCreationAttributes>
-  implements UserAttributes {
-  public id!: number;
-  public login!: string;
-  public name!: string;
-  public passwordHash!: string;
-  public passwordResetRequired!: boolean;
+export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+  declare id: CreationOptional<number>;
+  declare login: string;
+  declare name: string;
+  declare passwordHash: string;
+  declare passwordResetRequired: boolean;
 
   // prevent Next.js error (Date is not serializable)
-  public toJSON(): UserAttributes {
+  public toJSON(): InferAttributes<User> {
     const obj = super.toJSON();
     delete (obj as any).createdAt;
     delete (obj as any).updatedAt;
     return obj;
   }
 }
+
+export type UserAttributes = InferAttributes<User>;
+export type UserCreationAttributes = InferCreationAttributes<User>;
 
 export default function usersModel(sequelize: Sequelize) {
   User.init({
