@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import { Fragment, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Layout from '~/components/chat/Layout';
+import Messages from '~/components/chat/Messages';
+import UserListItem from '~/components/users/UserListItem';
 import UserSearchDialog from '~/components/users/UserSearchDialog';
 import db from '~/db/models';
 import { RUserAttributes } from '~/db/models/users';
@@ -18,6 +20,14 @@ interface HomePageProps {
 
 const HomePage: NextPage<HomePageProps> = ({ currentUser }) => {
   const [userSearchIsOpen, setUserSearchIsOpen] = useState(false);
+  const [activeThread, setActiveThread] = useState<RUserAttributes | null>(null);
+  const [newThread, setNewThread] = useState<RUserAttributes | null>(null);
+
+  const handleRecipientSelect = (user: RUserAttributes) => {
+    setUserSearchIsOpen(false);
+    setNewThread(user);
+    setActiveThread(user);
+  };
 
   return (
     <Layout
@@ -35,13 +45,22 @@ const HomePage: NextPage<HomePageProps> = ({ currentUser }) => {
           <UserSearchDialog
             open={userSearchIsOpen} onClose={() => setUserSearchIsOpen(false)}
             title="Select recipient"
-            onSelect={() => setUserSearchIsOpen(false)}
+            onSelect={handleRecipientSelect}
           />
         </Fragment>
       }
       currentUser={currentUser}
+      className="flex"
     >
-      <p>Home</p>
+      <div className="grow-0 shrink-0 w-60 border-r border-gray-300">
+        {newThread && (
+          <UserListItem user={newThread} className="bg-gray-100" />
+        )}
+        {/* list threads */}
+      </div>
+      {activeThread && (
+        <Messages currentUser={currentUser} interlocutor={activeThread} />
+      )}
     </Layout>
   );
 };
