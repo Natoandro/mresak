@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { HTMLAttributes, useContext, useEffect, useRef, useState } from 'react';
 import { UserAttributes } from '~/db/models/users';
 import MessageView from './MessageView';
 import MessageInput from './MessageInput';
+import UserContext from '~/contexts/user';
+import clsx from 'clsx';
 
-interface MessagesProps {
-  currentUser: UserAttributes;
+interface MessagesProps extends HTMLAttributes<HTMLDivElement> {
   interlocutor: UserAttributes; // the other member of the current thread
 }
 
@@ -18,18 +19,18 @@ export interface MessageAttributes {
   // seenAt: number;
 }
 
-export default function Messages({ currentUser, interlocutor }: MessagesProps) {
+export default function Messages({ interlocutor, className, ...props }: MessagesProps) {
+  const { user } = useContext(UserContext);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const [messages, setMessages] = useState<MessageAttributes[]>([]); // TODO: fetch
 
   const handleSend = (text: string) => {
     const msg: MessageAttributes = {
-      senderId: currentUser.id,
+      senderId: user.id,
       recipientId: interlocutor.id,
       sentAt: Date.now(),
       text,
-
     };
 
     setMessages(messages => [...messages, msg]);
@@ -40,7 +41,7 @@ export default function Messages({ currentUser, interlocutor }: MessagesProps) {
   }, [interlocutor]);
 
   return (
-    <div className="grow flex flex-col">
+    <div className={clsx('flex flex-col', className)} {...props}>
       <main className="grow flex flex-col space-y-2 py-2">
         <div className="grow" />
         {messages.map(msg => (

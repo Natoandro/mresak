@@ -7,6 +7,7 @@ import Layout from '~/components/chat/Layout';
 import Messages from '~/components/chat/Messages';
 import UserListItem from '~/components/users/UserListItem';
 import UserSearchDialog from '~/components/users/UserSearchDialog';
+import UserContext from '~/contexts/user';
 import db from '~/db/models';
 import { UserAttributes } from '~/db/models/users';
 import { getSession, Session } from '~/lib/session';
@@ -28,39 +29,48 @@ const HomePage: NextPage<HomePageProps> = ({ currentUser }) => {
     setActiveThread(user);
   };
 
+  const renderedActions = (
+    <Fragment>
+      <button
+        className="w-10 h-10 rounded-full hover:bg-blue-50 flex items-center justify-center opacity-80 hover:opacity-100 active:bg-blue-100"
+        title="New message"
+        onClick={() => setUserSearchIsOpen(true)}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" className="fill-blue-500">
+          <path d="M0,24 h24 v-2 h-24 z M4,18h3l12,-12l-3,-3l-12,12z" />
+        </svg>
+      </button>
+      <UserSearchDialog
+        open={userSearchIsOpen} onClose={() => setUserSearchIsOpen(false)}
+        title="Select recipient"
+        onSelect={handleRecipientSelect}
+      />
+    </Fragment>
+  );
+
+  const renderContent = () => {
+    if (activeThread == null) {
+      return null;
+    }
+    return (
+      <Fragment>
+        <div className="grow-0 shrink-0 w-60 border-r border-gray-300">
+          {newThread && (
+            <UserListItem user={newThread} className="bg-slate-200 m-1 rounded-md" />
+          )}
+          {/* list threads */}
+        </div>
+        <Messages interlocutor={activeThread} className="grow" />
+      </Fragment>
+    );
+  };
+
   return (
-    <Layout
-      actions={
-        <Fragment>
-          <button
-            className="w-10 h-10 rounded-full hover:bg-blue-50 flex items-center justify-center opacity-80 hover:opacity-100 active:bg-blue-100"
-            title="New message"
-            onClick={() => setUserSearchIsOpen(true)}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" className="fill-blue-500">
-              <path d="M0,24 h24 v-2 h-24 z M4,18h3l12,-12l-3,-3l-12,12z" />
-            </svg>
-          </button>
-          <UserSearchDialog
-            open={userSearchIsOpen} onClose={() => setUserSearchIsOpen(false)}
-            title="Select recipient"
-            onSelect={handleRecipientSelect}
-          />
-        </Fragment>
-      }
-      currentUser={currentUser}
-      className="flex"
-    >
-      <div className="grow-0 shrink-0 w-60 border-r border-gray-300">
-        {newThread && (
-          <UserListItem user={newThread} className="bg-slate-200 m-1 rounded-md" />
-        )}
-        {/* list threads */}
-      </div>
-      {activeThread && (
-        <Messages currentUser={currentUser} interlocutor={activeThread} />
-      )}
-    </Layout>
+    <UserContext.Provider value={{ user: currentUser }}>
+      <Layout actions={renderedActions} className="flex">
+        {renderContent()}
+      </Layout>
+    </UserContext.Provider>
   );
 };
 
