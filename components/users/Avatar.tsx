@@ -10,7 +10,7 @@ export default memo(function Avatar({ name, className, big = false, ...props }: 
   return (
     <div
       className={clsx(
-        'rounded-full bg-slate-300 flex items-center justify-center text-white',
+        'rounded-full bg-slate-400 flex items-center justify-center text-white',
         getClassName(big),
         className
       )}

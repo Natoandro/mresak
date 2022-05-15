@@ -14,7 +14,7 @@ export default function UserListItem({ user, className, oneLine = false, ...prop
       <li className={clsx('flex px-3 py-2 flex items-center', className)} {...props}>
         <Avatar name={user.name} className="mr-2" />
         <span>{user.name}</span>
-        <span className="text-gray-300 mx-2">&bull;</span>
+        <span className="text-gray-400 mx-2">&bull;</span>
         <span className="text-gray-500">@{user.login}</span>
       </li>
     );

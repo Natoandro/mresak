@@ -54,7 +54,7 @@ const HomePage: NextPage<HomePageProps> = ({ currentUser }) => {
     >
       <div className="grow-0 shrink-0 w-60 border-r border-gray-300">
         {newThread && (
-          <UserListItem user={newThread} className="bg-gray-100" />
+          <UserListItem user={newThread} className="bg-slate-200 m-1 rounded-md" />
         )}
         {/* list threads */}
       </div>
