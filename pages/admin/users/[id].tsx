@@ -9,7 +9,6 @@ import Avatar from '~/components/users/Avatar';
 import db from '~/db/models';
 import { UserAttributes } from '~/db/models/users';
 import { checkAdmin } from '~/lib/authz';
-import { toPlainObject } from '~/lib/model';
 import { getSession } from '~/lib/session';
 
 const ActionButton = ({ className, ...props }: ButtonProps) => (
@@ -82,6 +81,6 @@ export const getServerSideProps: GetServerSideProps<UserPageProps, RouteParams> 
     }
 
     return {
-      props: { user: toPlainObject(user) }
+      props: { user: user.toJSON() }
     };
   };

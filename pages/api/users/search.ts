@@ -5,7 +5,6 @@ import { requireUser } from '~/lib/authz';
 import sessionMiddleware from '~/lib/session';
 import { ApiRequest } from '~/lib/types';
 import { Op } from 'sequelize';
-import { toPlainObject } from '~/lib/model';
 
 
 interface GetReqExt {
@@ -25,10 +24,10 @@ export default nextConnect<ApiRequest, NextApiResponse>()
     if (q.startsWith('@')) {
       const search = q.slice(1);
       const match = await db.users.findAll({ where: { login: { [Op.startsWith]: search } } });
-      res.status(200).json(match.map(user => toPlainObject(user)));
+      res.status(200).json(match.map(user => user.toJSON()));
     } else {
       const match = await db.users.findAll({ where: { name: { [Op.substring]: q } } });
-      res.status(200).json(match.map(user => toPlainObject(user)));
+      res.status(200).json(match.map(user => user.toJSON()));
     }
   });
 

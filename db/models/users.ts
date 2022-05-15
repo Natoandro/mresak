@@ -17,6 +17,14 @@ export class User extends Model<UserAttributes, UserCreationAttributes>
   public name!: string;
   public passwordHash!: string;
   public passwordResetRequired!: boolean;
+
+  // prevent Next.js error (Date is not serializable)
+  public toJSON(): UserAttributes {
+    const obj = super.toJSON();
+    delete (obj as any).createdAt;
+    delete (obj as any).updatedAt;
+    return obj;
+  }
 }
 
 export default function usersModel(sequelize: Sequelize) {

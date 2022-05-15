@@ -9,7 +9,6 @@ import UserListItem from '~/components/users/UserListItem';
 import UserSearchDialog from '~/components/users/UserSearchDialog';
 import db from '~/db/models';
 import { UserAttributes } from '~/db/models/users';
-import { toPlainObject } from '~/lib/model';
 import { getSession, Session } from '~/lib/session';
 import FormField from '../components/common/FormField';
 
@@ -81,7 +80,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
     return {
       props: {
-        currentUser: toPlainObject(currentUser),
+        currentUser: currentUser.toJSON(),
       },
     };
   }
