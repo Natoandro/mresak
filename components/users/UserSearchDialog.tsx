@@ -14,6 +14,27 @@ interface UserSearchDialogProps {
   onSelect: (user: UserAttributes) => void;
 }
 
+function useCloseOnPressEscape(open: boolean, onClose: () => void) {
+  // onClose might be unstable (change on each render).
+  // We ensure to always call the last value.
+
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+
+  useEffect(() => {
+    if (open) {
+      const keyUpHandler = (e: KeyboardEvent) => {
+        if (e.code === 'Escape') onCloseRef.current?.();
+      };
+      window.addEventListener('keyup', keyUpHandler, true);
+
+      return () => window.removeEventListener('keyup', keyUpHandler);
+    }
+  }, [open]);
+}
+
 export default function UserSearchDialog(
   { title, open, onClose, onSelect }: UserSearchDialogProps
 ) {
@@ -50,6 +71,8 @@ export default function UserSearchDialog(
       inputRef.current?.focus();
     }
   }, [open]);
+
+  useCloseOnPressEscape(open, onClose);
 
   const handleOverlayClick = (e: MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
