@@ -1,12 +1,13 @@
-import { HTMLAttributes, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { HTMLAttributes, useEffect, useMemo, useRef } from 'react';
 import MessageView from './MessageView';
 import MessageInput from './MessageInput';
-import CurrentUserContext, { useCurrentUser } from '~/contexts/currentUser';
+import { useCurrentUser } from '~/contexts/currentUser';
 import clsx from 'clsx';
 import { ChatAttributes } from '~/db/models/chats';
 import { useAppDispatch, useAppSelector } from '~/app/hooks';
 import { enqueueMessage, MessageMeta, messageSent, selectChatState, setSendingStatus } from '~/app/features/chats/chatsSlice';
 import axios from 'axios';
+import { MessageAttributes } from '~/db/models/messages';
 
 interface MessagesProps extends HTMLAttributes<HTMLDivElement> {
   chat: ChatAttributes;
@@ -38,8 +39,8 @@ export default function Messages({ chat, className, ...props }: MessagesProps) {
   const allMessages = useMemo(() => [
     ...messages,
     ...queue.map((msg, i, arr) => ({
-      ...msg, id: i - arr.length, createdAt: new Date(),
-    }))
+      ...msg, id: i - arr.length, createdAt: Date.now(),
+    } as MessageAttributes))
   ], [messages, queue]);
 
   const handleSend = (text: string) => {

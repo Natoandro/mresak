@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { HTMLAttributes, useMemo } from 'react';
 import { useCurrentUser } from '~/contexts/currentUser';
 import { ChatAttributes } from '~/db/models/chats';
-import Avatar from '../users/Avatar';
+import Avatar from '~/components/users/Avatar';
 
 export interface RoomListItemProps extends HTMLAttributes<HTMLLIElement> {
   chat: ChatAttributes;
