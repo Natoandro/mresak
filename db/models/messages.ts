@@ -62,11 +62,18 @@ export default function messagesModel(sequelize: Sequelize) {
   });
 
   Message.belongsTo(Chat);
-  Chat.hasMany(Message);
+  Chat.hasMany(Message, {
+    foreignKey: {
+      allowNull: false,
+    }
+  });
 
   Message.belongsTo(User, { as: 'sender' });
-  User.hasMany(Message);
+  User.hasMany(Message, {
+    foreignKey: {
+      allowNull: false,
+    }
+  });
 
   return Message;
 }
-
