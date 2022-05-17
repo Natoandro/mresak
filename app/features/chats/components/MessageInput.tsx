@@ -1,4 +1,4 @@
-import { forwardRef, HTMLAttributes, KeyboardEvent, RefObject, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, HTMLAttributes, KeyboardEvent, useImperativeHandle, useRef, useState } from 'react';
 
 interface MessageInputRef {
   focus: () => void;

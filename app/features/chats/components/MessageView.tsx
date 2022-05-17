@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { HTMLAttributes } from 'react';
-import { MessageAttributes } from './Messages';
+import { MessageAttributes } from '~/db/models/messages';
 
 export interface MessageDisplayProps extends HTMLAttributes<HTMLDivElement> {
   message: MessageAttributes;
