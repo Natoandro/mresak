@@ -1,7 +1,7 @@
 import type { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import db from '~/db/models';
-import { ApiRequest } from '~/lib/api/';
+import { ApiRequest } from '~/lib/api/types';
 import bcrypt from 'bcrypt';
 import sessionMiddleware from '~/lib/session';
 
@@ -26,9 +26,8 @@ handler.post<PostReqExt>(async (req, res) => {
 
   const ok = await bcrypt.compare(password, user.passwordHash);
   if (ok) {
-    const { passwordResetRequired } = user;
     req.session.userId = user.id;
-    res.status(200).json({ passwordResetRequired });
+    res.status(200).json(user.toJSON());
   } else {
     res.status(403).json({
       error: 'invalid password'

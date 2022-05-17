@@ -1,11 +1,13 @@
 import axios from 'axios';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Button from '~/components/common/Button';
 import FormCard from '~/components/common/FormCard';
 import FormField from '~/components/common/FormField';
+import CurrentUserContext from '~/contexts/currentUser';
+import { UserAttributes } from '~/db/models/users';
 
 
 
@@ -25,11 +27,14 @@ const LoginPage: NextPage = () => {
   const login = watch('login');
   const password = watch('password');
 
+  const { setUser } = useContext(CurrentUserContext);
+
   // TODO: handle invalid password
   const [passwordIsInvalid, setPasswordIsInvalid] = useState(false);
   const onSubmit = async (data: FieldValues) => {
     try {
-      const res = await axios.post<LoginResult>('/api/login', data);
+      const res = await axios.post<UserAttributes>('/api/login', data);
+      setUser(res.data);
       const { passwordResetRequired } = res.data;
       if (passwordResetRequired) {
         await router.replace('/me/password-reset');
