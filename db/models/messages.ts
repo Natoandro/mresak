@@ -64,6 +64,7 @@ export default function messagesModel(sequelize: Sequelize) {
   Message.belongsTo(Chat);
   Chat.hasMany(Message, {
     foreignKey: {
+      name: 'chatId',
       allowNull: false,
     }
   });
@@ -71,6 +72,7 @@ export default function messagesModel(sequelize: Sequelize) {
   Message.belongsTo(User, { as: 'sender' });
   User.hasMany(Message, {
     foreignKey: {
+      name: 'senderId',
       allowNull: false,
     }
   });
