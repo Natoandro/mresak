@@ -1,16 +1,14 @@
 import axios from 'axios';
-import clsx from 'clsx';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { Fragment, useEffect, useState } from 'react';
-import { chatAdded, chatsLoaded, selectChats, selectChatState } from '~/app/features/chats/chatsSlice';
+import { chatAdded, chatsLoaded, selectChatState } from '~/app/features/chats/chatsSlice';
 import { useAppDispatch, useAppSelector } from '~/app/hooks';
 import Layout from '~/components/chats/Layout';
 import Messages from '~/components/chats/Messages';
-import UserListItem from '~/components/users/UserListItem';
+import RoomList from '~/components/chats/RoomList';
 import UserSearchDialog from '~/components/users/UserSearchDialog';
-import { useCurrentUser } from '~/contexts/currentUser';
 import db from '~/db/models';
 import { ChatAttributes } from '~/db/models/chats';
 import { UserAttributes } from '~/db/models/users';
@@ -53,12 +51,10 @@ function Actions({ onRecipientSelect }: ActionsProps) {
 }
 
 function PageContent({ activeChatId }: { activeChatId: number; }) {
-  const currentUser = useCurrentUser();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
   const { chat } = useAppSelector(state => selectChatState(state, activeChatId)!);
-  const chats = useAppSelector(selectChats);
 
   const handleRecipientSelect = async (user: UserAttributes) => {
     const { data: chat } = await axios.post<ChatAttributes>(`/api/chats`, {
@@ -71,18 +67,7 @@ function PageContent({ activeChatId }: { activeChatId: number; }) {
   return (
     <Layout actions={<Actions onRecipientSelect={handleRecipientSelect} />} className="flex" >
       <Fragment>
-        <div className="grow-0 shrink-0 w-60 p-1 border-r border-gray-300 overflow-y-auto" >
-          {chats.map((chat) => (
-            <UserListItem
-              key={chat.id}
-              user={chat.members!.find(user => user.id !== currentUser.id)!}
-              className={clsx(
-                'hover:bg-slate-100 m-1 rounded-md',
-                chat.id === activeChatId && 'bg-violet-200 hover:bg-violet-200',
-              )}
-            />
-          ))}
-        </div>
+        <RoomList activeChatId={activeChatId} className="grow-0 shrink-0 w-80" />
         <Messages chat={chat} className="grow overflow-y-auto" />
       </Fragment>
 
