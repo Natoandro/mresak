@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import Image from 'next/image';
 import { HTMLAttributes, PropsWithChildren, ReactNode, useContext } from 'react';
-import CurrentUserContext from '~/contexts/currentUser';
+import CurrentUserContext, { useCurrentUser } from '~/contexts/currentUser';
 import { UserAttributes } from '~/db/models/users';
 import Avatar from '../users/Avatar';
 import UserListItem from '../users/UserListItem';
@@ -13,7 +13,7 @@ export type ChatPageLayoutProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
 export default function ChatPageLayout(
   { actions, children, className, ...props }: ChatPageLayoutProps
 ) {
-  const { user } = useContext(CurrentUserContext);
+  const user = useCurrentUser();
   return (
     <div className="h-screen flex flex-col relative bg-slate-100">
       <header className="shadow-z1 h-12 flex justify-center bg-blue-100 z-10">
@@ -25,7 +25,7 @@ export default function ChatPageLayout(
           <div className="grow-0">{actions}</div>
         </div>
       </header>
-      <main className={clsx('grow max-w-screen-md w-full self-center bg-white md:border-x border-gray-300', className)}>
+      <main className={clsx('grow max-w-screen-md w-full h-screen overflow-hidden pt-12 absolute self-center bg-white md:border-x border-gray-300', className)}>
         {children}
       </main>
     </div>

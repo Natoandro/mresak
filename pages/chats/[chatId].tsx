@@ -71,7 +71,7 @@ function PageContent({ activeChatId }: { activeChatId: number; }) {
   return (
     <Layout actions={<Actions onRecipientSelect={handleRecipientSelect} />} className="flex" >
       <Fragment>
-        <div className="grow-0 shrink-0 w-60 border-r border-gray-300" >
+        <div className="grow-0 shrink-0 w-60 p-1 border-r border-gray-300 overflow-y-auto" >
           {chats.map((chat) => (
             <UserListItem
               key={chat.id}
@@ -83,7 +83,7 @@ function PageContent({ activeChatId }: { activeChatId: number; }) {
             />
           ))}
         </div>
-        <Messages chat={chat} className="grow" />
+        <Messages chat={chat} className="grow overflow-y-auto" />
       </Fragment>
 
     </Layout>
