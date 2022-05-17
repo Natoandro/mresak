@@ -1,23 +1,17 @@
 import axios from 'axios';
-import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import { Fragment, useEffect, useState } from 'react';
-import { chatAdded, chatsLoaded, selectChatState } from '~/app/features/chats/chatsSlice';
+import { Fragment, useEffect, useMemo, useState } from 'react';
+import { chatAdded, selectChatState } from '~/app/features/chats/chatsSlice';
 import { useAppDispatch, useAppSelector } from '~/app/hooks';
 import Layout from '~/app/features/chats/components/Layout';
 import Messages from '~/app/features/chats/components/Messages';
 import RoomList from '~/app/features/chats/components/RoomList';
 import UserSearchDialog from '~/components/users/UserSearchDialog';
-import db from '~/db/models';
 import { ChatAttributes } from '~/db/models/chats';
 import { UserAttributes } from '~/db/models/users';
-import ssrCurrentUser from '~/lib/ssrCurrentUser';
-
-interface PageProps {
-  chats: ChatAttributes[];
-  activeChatId: number;
-}
+import useActiveChatId from '~/app/features/chats/hooks/useActiveChatId';
+import useFetchChatRooms from '~/app/features/chats/hooks/useFetchChatRooms';
 
 
 interface ActionsProps {
@@ -50,11 +44,9 @@ function Actions({ onRecipientSelect }: ActionsProps) {
   );
 }
 
-function PageContent({ activeChatId }: { activeChatId: number; }) {
+export default function ChatPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-
-  const { chat } = useAppSelector(state => selectChatState(state, activeChatId)!);
 
   const handleRecipientSelect = async (user: UserAttributes) => {
     const { data: chat } = await axios.post<ChatAttributes>(`/api/chats`, {
@@ -64,64 +56,16 @@ function PageContent({ activeChatId }: { activeChatId: number; }) {
     router.push(`/chats/${chat.id}`);
   };
 
+  useFetchChatRooms();
+
   return (
     <Layout actions={<Actions onRecipientSelect={handleRecipientSelect} />} className="flex" >
       <Fragment>
-        <RoomList activeChatId={activeChatId} className="grow-0 shrink-0 w-80" />
-        <Messages chat={chat} className="grow overflow-y-auto" />
+        <RoomList className="grow-0 shrink-0 w-80" />
+        <Messages className="grow overflow-y-auto" />
       </Fragment>
 
     </Layout>
   );
 }
 
-export default function ChatPage({ chats, activeChatId }: PageProps) {
-  const dispatch = useAppDispatch();
-  const [initialized, setInitialized] = useState(false);
-
-  useEffect(() => {
-    if (!initialized) {
-      console.log('INIT');
-      dispatch(chatsLoaded(chats));
-      setInitialized(true);
-    }
-  }, [initialized, setInitialized, dispatch, chats]);
-
-  if (initialized) {
-    return <PageContent activeChatId={activeChatId} />;
-  }
-};
-
-
-
-
-interface Params extends ParsedUrlQuery {
-  chatId: string;
-}
-
-const parseParams = ({ chatId }: { chatId: string; }) => ({
-  chatId: parseInt(chatId, 10),
-});
-
-export const getServerSideProps: GetServerSideProps<PageProps, Params> = async (ctx) => {
-  const currentUser = await ssrCurrentUser(ctx);
-  if (currentUser == null) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      }
-    };
-  }
-
-  const { chatId } = parseParams(ctx.params!);
-
-  const chats = await db.chats.findAllByMember(currentUser.id);
-
-  return {
-    props: {
-      chats: chats.map(chat => chat.toJSON()),
-      activeChatId: chatId,
-    }
-  };
-};

@@ -2,7 +2,7 @@ import { ActionReducerMapBuilder, createAsyncThunk, createSelector, EntityState 
 import axios from 'axios';
 import { RootState } from '~/app/store';
 import { MessageAttributes } from '~/db/models/messages';
-import { ChatState, selectChatState } from './chatsSlice';
+import { ChatState, selectChatState, SliceState } from './chatsSlice';
 
 const selectOldestMessage = createSelector(
   (s: RootState, chatId: number) => selectChatState(s, chatId)!,
@@ -19,7 +19,6 @@ const getUrl = (chatId: number, oldestMessage: number | undefined): string => {
 const fetchMessages = createAsyncThunk(
   'chats/fetchMessage',
   async (chatId: number, api) => {
-    console.log('fetching messages', chatId);
     const oldestMessage = selectOldestMessage(api.getState() as RootState, chatId);
     const res = await axios.get<MessageAttributes[]>(getUrl(chatId, oldestMessage));
     return res.data;
@@ -29,21 +28,20 @@ const fetchMessages = createAsyncThunk(
 //* None of these reducers change the sorting order of the entities,
 //* it is therefore safe to make updates outsize of `updateOne`.
 
-export const fetchMessageReducers = (builder: ActionReducerMapBuilder<EntityState<ChatState>>) => {
+export const fetchMessagesReducers = (builder: ActionReducerMapBuilder<SliceState>) => {
   builder.addCase(fetchMessages.pending, (state, action) => {
-    console.dir(action);
-    state.entities[action.meta.arg]!.messageFetchingStatus = 'pending';
+    state.data.entities[action.meta.arg]!.messageFetchingStatus = 'pending';
   });
 
   builder.addCase(fetchMessages.fulfilled, (state, action) => {
     console.log('fetchMessages/fulfilled', action);
-    const localState = state.entities[action.meta.arg]!;
+    const localState = state.data.entities[action.meta.arg]!;
     localState.messages.unshift(...action.payload);
     localState.messageFetchingStatus = 'success';
   });
 
   builder.addCase(fetchMessages.rejected, (state, action) => {
-    state.entities[action.meta.arg]!.messageFetchingStatus = 'pending';
+    state.data.entities[action.meta.arg]!.messageFetchingStatus = 'pending';
   });
 };
 

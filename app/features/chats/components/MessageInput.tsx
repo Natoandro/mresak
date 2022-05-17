@@ -1,15 +1,21 @@
 import { forwardRef, HTMLAttributes, KeyboardEvent, useImperativeHandle, useRef, useState } from 'react';
+import { useAppDispatch } from '~/app/hooks';
+import { useCurrentUser } from '../../users/contexts/CurrentUser';
+import { enqueueMessage } from '../chatsSlice';
+import useActiveChatId from '../hooks/useActiveChatId';
 
 interface MessageInputRef {
   focus: () => void;
 }
 
-interface MessageInputProps extends HTMLAttributes<HTMLDivElement> {
-  onSend: (message: string) => void;
-}
+interface MessageInputProps extends HTMLAttributes<HTMLDivElement> { }
 
 export default forwardRef<MessageInputRef, MessageInputProps>(
-  function MessageInput({ onSend, ...props }, ref) {
+  function MessageInput(props, ref) {
+    const dispatch = useAppDispatch();
+    const user = useCurrentUser();
+    const activeChatId = useActiveChatId();
+
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const [message, setMessage] = useState('');
 
@@ -18,7 +24,11 @@ export default forwardRef<MessageInputRef, MessageInputProps>(
     }));
 
     const handleSubmit = () => {
-      onSend(message);
+      dispatch(enqueueMessage({
+        senderId: user!.id,
+        chatId: activeChatId,
+        text: message,
+      }));
       setMessage('');
     };
 

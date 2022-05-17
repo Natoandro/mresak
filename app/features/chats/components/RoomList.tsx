@@ -1,17 +1,20 @@
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
-import { HTMLAttributes } from 'react';
-import { selectChats } from '~/app/features/chats/chatsSlice';
+import { HTMLAttributes, ReactNode } from 'react';
+import { selectIsReady, selectChats } from '~/app/features/chats/chatsSlice';
 import { useAppSelector } from '~/app/hooks';
 import { useCurrentUser } from '../../users/contexts/CurrentUser';
+import useActiveChatId from '../hooks/useActiveChatId';
 import { RoomListItem } from './RoomListItem';
 
-export interface RoomListProps extends HTMLAttributes<HTMLDivElement> {
-  activeChatId: number;
-}
+export interface RoomListProps extends HTMLAttributes<HTMLDivElement> { }
 
-export default function RoomList({ activeChatId, className, ...props }: RoomListProps) {
+export default function RoomList({ className, ...props }: RoomListProps) {
   const router = useRouter();
+  const user = useCurrentUser();
+  const activeChatId = useActiveChatId();
+  //* room list items requires user to be not null
+  const isReady = useAppSelector(selectIsReady) && user != null;
   const chats = useAppSelector(selectChats);
 
   const handleItemClick = (chatId: number) => {
@@ -20,12 +23,10 @@ export default function RoomList({ activeChatId, className, ...props }: RoomList
     }
   };
 
-  const user = useCurrentUser();
-
   // TODO: skeleton
-  return user && (
-    <div className={clsx('p-1 border-r border-gray-300 overflow-y-auto', className)} >
-      {chats.map((chat) => (
+  return (
+    <div className={clsx('p-1 border-r border-gray-300 overflow-y-auto', className)} {...props}>
+      {isReady && chats.map((chat) => (
         <RoomListItem
           key={chat.id} chat={chat}
           className={clsx(

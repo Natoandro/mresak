@@ -3,10 +3,10 @@ import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import CurrentUserContext from '~/app/features/users/contexts/CurrentUser';
 import Button from '~/components/common/Button';
 import FormCard from '~/components/common/FormCard';
 import FormField from '~/components/common/FormField';
-import CurrentUserContext from '~/contexts/currentUser';
 import { UserAttributes } from '~/db/models/users';
 
 

@@ -3,12 +3,14 @@ import {
   createEntityAdapter,
   createSelector,
   createSlice,
+  EntityState,
   PayloadAction
 } from '@reduxjs/toolkit';
 import { RootState } from '~/app/store';
 import { ChatAttributes } from '~/db/models/chats';
 import { MessageAttributes, MessageCreationAttributes } from '~/db/models/messages';
-import { fetchMessageReducers } from './fetchMessages';
+import { fetchChatRoomsReducers } from './fetchChatRooms';
+import { fetchMessagesReducers } from './fetchMessages';
 
 export type SendingStatus = 'idle' | 'active' | 'error';
 
@@ -39,21 +41,19 @@ interface SetSendingStatusPayload {
 }
 
 
+const initialState = {
+  data: chatsAdapter.getInitialState(),
+  loading: 'idle' as LoadingState,
+};
+
+export type SliceState = typeof initialState;
+
 const chatsSlice = createSlice({
   name: 'chats',
-  initialState: chatsAdapter.getInitialState(),
+  initialState,
   reducers: {
-    chatsLoaded: (state, action: PayloadAction<ChatAttributes[]>) => {
-      chatsAdapter.addMany(state, action.payload.map(chat => ({
-        chat,
-        queue: [],
-        sendingStatus: 'idle',
-        messages: [],
-        messageFetchingStatus: 'idle',
-      })));
-    },
     chatAdded: (state, action: PayloadAction<ChatAttributes>) => {
-      chatsAdapter.addOne(state, {
+      chatsAdapter.addOne(state.data, {
         chat: action.payload,
         queue: [],
         sendingStatus: 'idle',
@@ -62,8 +62,8 @@ const chatsSlice = createSlice({
       });
     },
     enqueueMessage: (state, action: PayloadAction<MessageCreationAttributes>) => {
-      const localState = selectById(state, action.payload.chatId)!;
-      chatsAdapter.updateOne(state, {
+      const localState = selectById(state.data, action.payload.chatId)!;
+      chatsAdapter.updateOne(state.data, {
         id: action.payload.chatId,
         changes: {
           queue: [...localState.queue, action.payload],
@@ -71,18 +71,18 @@ const chatsSlice = createSlice({
       });
     },
     messageSent: (state, action: PayloadAction<MessageMeta>) => {
-      const localState = selectById(state, action.payload.chatId)!;
+      const localState = selectById(state.data, action.payload.chatId)!;
       const [front, ...queue] = localState.queue;
       const messages = [...localState.messages, { ...front, ...action.payload }];
       const chat: ChatAttributes = { ...localState.chat, latestActivityDate: action.payload.createdAt };
-      chatsAdapter.updateOne(state, {
+      chatsAdapter.updateOne(state.data, {
         id: action.payload.chatId,
         changes: { queue, messages, chat },
       });
     },
     // TODO: higher level
     setSendingStatus: (state, action: PayloadAction<SetSendingStatusPayload>) => {
-      chatsAdapter.updateOne(state, {
+      chatsAdapter.updateOne(state.data, {
         id: action.payload.chatId,
         changes: {
           sendingStatus: action.payload.status,
@@ -92,33 +92,49 @@ const chatsSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    fetchMessageReducers(builder);
+    fetchChatRoomsReducers(builder);
+    fetchMessagesReducers(builder);
   }
 });
 
 export const {
-  chatsLoaded, chatAdded,
+  chatAdded,
   enqueueMessage, messageSent,
   setSendingStatus,
 } = chatsSlice.actions;
 
 export const selectChatState = (state: RootState, chatId: number) => (
-  selectById(state.chats, chatId)
+  selectById(state.chats.data, chatId)
 );
 
 export const selectOtherChatMembers = (state: RootState, chatId: number, selfId: number) =>
-  selectById(state.chats, chatId)!.chat.members!.filter(mb => mb.id !== selfId);
+  selectById(state.chats.data, chatId)!.chat.members!.filter(mb => mb.id !== selfId);
+
+export const selectIsReady = (state: RootState) => state.chats.loading === 'success';
 
 export const selectChats = createSelector(
-  (s: RootState) => selectAll(s.chats),
+  (s: RootState) => selectAll(s.chats.data),
   (all) => all.map(cs => cs.chat)
 );
 
-
+export const selectChat = (state: RootState, chatId: number) => (
+  selectById(state.chats.data, chatId)
+);
 
 export const selectMessageLoadingStatus = createSelector(
-  (s: RootState, chatId: number) => selectChatState(s, chatId)!,
-  (cs) => cs.messageFetchingStatus,
+  (s: RootState, chatId: number) => selectChatState(s, chatId),
+  (cs) => cs?.messageFetchingStatus,
+);
+
+// TODO
+export const selectAllMessages = createSelector(
+  (s: RootState, chatId: number) => selectChatState(s, chatId),
+  (cs) => cs && [
+    ...cs.messages,
+    ...cs.queue.map((msg, i, arr) => ({
+      ...msg, id: i - arr.length, createdAt: Date.now(),
+    } as MessageAttributes))
+  ]
 );
 
 export default chatsSlice.reducer;
