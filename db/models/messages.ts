@@ -10,6 +10,7 @@ import {
   CreationAttributes,
   NonAttribute
 } from 'sequelize';
+import { NextSerializable } from '~/lib/types';
 import { Chat } from './chats';
 import { User } from './users';
 
@@ -39,7 +40,7 @@ export class Message
   }
 }
 
-export type MessageAttributes = Attributes<Message>;
+export type MessageAttributes = NextSerializable<Attributes<Message>>;
 export type MessageCreationAttributes = CreationAttributes<Message>;
 
 export default function messagesModel(sequelize: Sequelize) {

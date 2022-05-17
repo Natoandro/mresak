@@ -1,4 +1,9 @@
-import { clearAllListeners, createEntityAdapter, createSelector, createSlice, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
+import {
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+  PayloadAction
+} from '@reduxjs/toolkit';
 import { RootState } from '~/app/store';
 import { ChatAttributes } from '~/db/models/chats';
 import { MessageAttributes, MessageCreationAttributes } from '~/db/models/messages';
@@ -72,9 +77,10 @@ const chatsSlice = createSlice({
       const localState = selectById(state, action.payload.chatId)!;
       const [front, ...queue] = localState.queue;
       const messages = [...localState.messages, { ...front, ...action.payload }];
+      const chat: ChatAttributes = { ...localState.chat, latestActivityDate: action.payload.createdAt };
       chatsAdapter.updateOne(state, {
         id: action.payload.chatId,
-        changes: { queue, messages, }
+        changes: { queue, messages, chat },
       });
     },
     // TODO: higher level
