@@ -82,7 +82,6 @@ function PageContent({ activeChatId }: { activeChatId: number; }) {
               )}
             />
           ))}
-
         </div>
         <Messages chat={chat} className="grow" />
       </Fragment>

@@ -21,8 +21,8 @@ export class ChatMembers
 
   public toJSON(): ChatMembersAttributes {
     const obj = super.toJSON() as unknown as ChatMembersAttributes;
-    obj.latestDelivered = String(obj.latestDelivered);
-    obj.latestSeen = String(obj.latestSeen);
+    obj.latestDelivered = Number(obj.latestDelivered);
+    obj.latestSeen = Number(obj.latestSeen);
     return obj;
   }
 }

@@ -13,16 +13,9 @@ interface ChatState {
   complete: boolean; // list is complete
 }
 
-const latestActivity = (cs: ChatState): Date => {
-  if (cs.messages.length) {
-    return cs.messages[cs.messages.length - 1].createdAt;
-  }
-  return new Date(cs.chat.createdAt);
-};
-
 const chatsAdapter = createEntityAdapter<ChatState>({
   selectId: (s) => s.chat.id,
-  sortComparer: (a, b) => Number(latestActivity(a)) - Number(latestActivity(b)),
+  sortComparer: (a, b) => b.chat.latestActivityDate - a.chat.latestActivityDate,
 });
 
 const selectors = chatsAdapter.getSelectors();
