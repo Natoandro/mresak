@@ -1,7 +1,7 @@
 import type { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import db from '~/db/models';
-import { ApiRequest } from '~/lib/types';
+import { ApiRequest } from '~/lib/api/';
 import bcrypt from 'bcrypt';
 import sessionMiddleware from '~/lib/session';
 

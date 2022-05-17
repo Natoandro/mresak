@@ -3,7 +3,7 @@ import nextConnect from 'next-connect';
 import db from '~/db/models';
 import { requireUser } from '~/lib/authz';
 import sessionMiddleware from '~/lib/session';
-import { ApiRequest } from '~/lib/types';
+import { ApiRequest } from '~/lib/api/';
 import { Op } from 'sequelize';
 
 

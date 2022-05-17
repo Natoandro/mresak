@@ -3,7 +3,7 @@ import nextConnect from 'next-connect';
 import bcrypt from 'bcrypt';
 import db from '~/db/models';
 import sessionMiddleware, { ReqExt } from '~/lib/session';
-import { ApiRequest } from '~/lib/types';
+import { ApiRequest } from '~/lib/api/';
 import { ADMIN_SESS_MAXAGE } from '~/lib/consts';
 
 interface PostReqExt {

@@ -1,17 +1,16 @@
 import axios from 'axios';
 import type { NextPage, GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
 import { Fragment, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import Layout from '~/components/chat/Layout';
-import Messages from '~/components/chat/Messages';
+import { chatAdded } from '~/app/features/chats/chatsSlice';
+import { useAppDispatch } from '~/app/hooks';
+import Layout from '~/components/chats/Layout';
+import Messages from '~/components/chats/Messages';
 import UserListItem from '~/components/users/UserListItem';
 import UserSearchDialog from '~/components/users/UserSearchDialog';
-import UserContext from '~/contexts/user';
 import db from '~/db/models';
+import { ChatAttributes } from '~/db/models/chats';
 import { UserAttributes } from '~/db/models/users';
-import { getSession, Session } from '~/lib/session';
-import FormField from '../components/common/FormField';
+import ssrCurrentUser from '~/lib/ssrCurrentUser';
 
 
 interface HomePageProps {
@@ -20,13 +19,17 @@ interface HomePageProps {
 
 const HomePage: NextPage<HomePageProps> = ({ currentUser }) => {
   const [userSearchIsOpen, setUserSearchIsOpen] = useState(false);
-  const [activeThread, setActiveThread] = useState<UserAttributes | null>(null);
-  const [newThread, setNewThread] = useState<UserAttributes | null>(null);
+  const [activeChat, setActiveChat] = useState<ChatAttributes | null>(null);
 
-  const handleRecipientSelect = (user: UserAttributes) => {
+  const dispatch = useAppDispatch();
+
+  const handleRecipientSelect = async (user: UserAttributes) => {
+    const res = await axios.post<ChatAttributes>(`/api/chats`, {
+      memberIds: [user.id]
+    });
+    dispatch(chatAdded(res.data));
+    setActiveChat(res.data);
     setUserSearchIsOpen(false);
-    setNewThread(user);
-    setActiveThread(user);
   };
 
   const renderedActions = (
@@ -48,60 +51,33 @@ const HomePage: NextPage<HomePageProps> = ({ currentUser }) => {
     </Fragment>
   );
 
-  const renderContent = () => {
-    if (activeThread == null) {
-      return null;
-    }
-    return (
-      <Fragment>
-        <div className="grow-0 shrink-0 w-60 border-r border-gray-300">
-          {newThread && (
-            <UserListItem user={newThread} className="bg-slate-200 m-1 rounded-md" />
-          )}
-          {/* list threads */}
-        </div>
-        <Messages interlocutor={activeThread} className="grow" />
-      </Fragment>
-    );
-  };
-
   return (
-    <UserContext.Provider value={{ user: currentUser }}>
-      <Layout actions={renderedActions} className="flex">
-        {renderContent()}
-      </Layout>
-    </UserContext.Provider>
+    <Layout actions={renderedActions} className="flex">
+      {activeChat && (
+        <Fragment>
+          <div className="grow-0 shrink-0 w-60 border-r border-gray-300">
+            {activeChat?.id !== 0 && (
+              <UserListItem
+                user={activeChat.members!.find(user => user.id !== currentUser.id)!}
+                className="bg-slate-200 m-1 rounded-md"
+              />
+            )}
+
+          </div>
+          <Messages
+            chat={activeChat}
+            className="grow"
+          />
+        </Fragment>
+      )}
+    </Layout>
   );
 };
 
 export default HomePage;
 
-let dbSynced = false;
-
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const session: Session = await getSession(req, res);
-  if (session.userId != null) {
-    // logged in
-    // TODO: list chat threads
-    const currentUser = await db.users.findByPk(session.userId);
-    if (currentUser == null) {
-      return { notFound: true }; //! TODO: end current session
-    }
-
-    return {
-      props: {
-        currentUser: currentUser.toJSON(),
-      },
-    };
-  }
-
-  if (!dbSynced) {
-    await db.sequelize.sync();
-    dbSynced = true;
-  }
-
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const admin = await db.admin.findOne();
-
   if (admin == null) {
     // first run
     return {
@@ -112,7 +88,25 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     };
   }
 
-  return {
-    redirect: { destination: '/login', permanent: false, },
-  };
+  const currentUser = await ssrCurrentUser(ctx);
+
+  if (currentUser == null) {
+    return {
+      redirect: { destination: '/login', permanent: false, },
+    };
+  } else {
+    // latest chat
+    const chat = await db.chats.findLatestByMember(currentUser.id);
+    console.log('latest chat', chat);
+    if (chat == null) {
+      return { notFound: true }; // TODO: new chat
+    } else {
+      return {
+        redirect: {
+          destination: `/chats/${chat.id}`,
+          permanent: false
+        },
+      };
+    }
+  }
 };

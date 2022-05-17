@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.8.1",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
     "clsx": "^1.1.1",
@@ -19,6 +20,7 @@
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-hook-form": "^7.31.1",
+    "react-redux": "^8.0.1",
     "sequelize": "^6.19.0",
     "sqlite3": "^5.0.8"
   },

@@ -1,6 +1,6 @@
 import { ADMIN_SESS_MAXAGE } from './consts';
 import { Session } from './session';
-import { RequestHandler } from './types';
+import { RequestHandler } from './api/types';
 
 
 export function checkAdmin(session: Session): boolean {
@@ -34,4 +34,3 @@ export const requireUser: RequestHandler = (req, res, next) => {
     });
   }
 };
-
