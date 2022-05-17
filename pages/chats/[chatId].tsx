@@ -32,8 +32,8 @@ function Actions({ onRecipientSelect }: ActionsProps) {
   return (
     <Fragment>
       <button
-        className="w-10 h-10 rounded-full hover:bg-blue-50 flex items-center justify-center opacity-80 hover:opacity-100 active:bg-blue-100"
-        title="New message"
+        className="w-10 h-10 rounded-full hover:bg-blue-500/10 flex items-center justify-center opacity-80 hover:opacity-100 active:bg-blue-500/20"
+        title="New chat room"
         onClick={() => setUserSearchIsOpen(true)}
       >
         <svg width="24" height="24" viewBox="0 0 24 24" className="fill-blue-500" >
