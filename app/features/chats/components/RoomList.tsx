@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { HTMLAttributes } from 'react';
 import { selectChats } from '~/app/features/chats/chatsSlice';
 import { useAppSelector } from '~/app/hooks';
+import { useCurrentUser } from '../../users/contexts/CurrentUser';
 import { RoomListItem } from './RoomListItem';
 
 export interface RoomListProps extends HTMLAttributes<HTMLDivElement> {
@@ -19,7 +20,10 @@ export default function RoomList({ activeChatId, className, ...props }: RoomList
     }
   };
 
-  return (
+  const user = useCurrentUser();
+
+  // TODO: skeleton
+  return user && (
     <div className={clsx('p-1 border-r border-gray-300 overflow-y-auto', className)} >
       {chats.map((chat) => (
         <RoomListItem

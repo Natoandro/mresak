@@ -1,7 +1,6 @@
 import { HTMLAttributes, useEffect, useMemo, useRef } from 'react';
 import MessageView from './MessageView';
 import MessageInput from './MessageInput';
-import { useCurrentUser } from '~/contexts/currentUser';
 import clsx from 'clsx';
 import { ChatAttributes } from '~/db/models/chats';
 import { useAppDispatch, useAppSelector } from '~/app/hooks';
@@ -9,6 +8,7 @@ import { enqueueMessage, MessageMeta, messageSent, selectChatState, SendingStatu
 import axios from 'axios';
 import { MessageAttributes } from '~/db/models/messages';
 import useFetchMessages from '../hooks/useFetchMessages';
+import { useCurrentUser } from '../../users/contexts/CurrentUser';
 
 interface MessagesProps extends HTMLAttributes<HTMLDivElement> {
   chat: ChatAttributes;
@@ -51,7 +51,7 @@ export default function Messages({ chat, className, ...props }: MessagesProps) {
 
   const handleSend = (text: string) => {
     dispatch(enqueueMessage({
-      senderId: user.id,
+      senderId: user!.id,
       chatId: chat.id,
       text,
     }));
@@ -61,7 +61,8 @@ export default function Messages({ chat, className, ...props }: MessagesProps) {
     inputRef.current?.focus();
   }, [chat.id]);
 
-  return (
+  // TODO: skeleton??
+  return user && (
     <div className={clsx('flex flex-col', className)} {...props}>
       <main className="grow flex flex-col space-y-2 py-2">
         <div className="grow" />

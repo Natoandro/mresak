@@ -3,6 +3,7 @@ module.exports = {
     './pages/**/*.tsx',
     './components/**/*.tsx',
     './app/features/*/components/*.tsx',
+    './app/commons/components/*.tsx',
     './icons/**/*.tsx',
   ],
   theme: {

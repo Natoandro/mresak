@@ -1,8 +1,9 @@
 import clsx from 'clsx';
 import Image from 'next/image';
 import { HTMLAttributes, PropsWithChildren, ReactNode } from 'react';
-import { useCurrentUser } from '~/contexts/currentUser';
 import UserListItem from '~/components/users/UserListItem';
+import { useCurrentUser } from '@/users/contexts/CurrentUser';
+import CurrentUserView from '../../users/components/CurrentUserView';
 
 export type ChatPageLayoutProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   actions?: ReactNode;
@@ -18,7 +19,7 @@ export default function ChatPageLayout(
         <div className="px-4 py-2 flex items-center w-full max-w-screen-md">
           <Image src="/logo_32x32.png" width={32} height={32} alt="M&apos;Resak logo" />
           <h1 className="text-2xl text-blue-500 italic ml-2 mr-4">M&apos;Resak</h1>
-          <UserListItem user={user} oneLine />
+          <CurrentUserView />
           <div className="grow"></div> {/* spacer */}
           <div className="grow-0">{actions}</div>
         </div>
