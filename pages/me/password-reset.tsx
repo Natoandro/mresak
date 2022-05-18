@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { NextPage } from 'next';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { Field, useForm } from 'react-hook-form';
 import Alert from '~/components/common/Alert';
@@ -20,6 +21,7 @@ const PasswordResetPage: NextPage = () => {
     watch,
     formState: { errors }
   } = useForm<FieldValues>({ mode: 'onChange' });
+  const router = useRouter();
   const password = watch('newPassword');
 
   const [message, setMessage] = useState<'success' | 'error' | null>(null);
@@ -32,7 +34,11 @@ const PasswordResetPage: NextPage = () => {
         from: currentPassword,
         to: newPassword,
       });
-      setMessage('success');
+      if (router.query.next != null) {
+        router.replace(router.query.next as string);
+      } else {
+        setMessage('success');
+      }
     } catch (err) {
       console.error(err);
       setMessage('error');
