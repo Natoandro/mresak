@@ -63,4 +63,24 @@ handler.post<PostReqExt>(async (req, res) => {
   });
 });
 
+interface PatchReqExt {
+  query: Query;
+  body: {
+    type: 'seen';
+  };
+}
+
+handler.patch<PatchReqExt>(async (req, res) => {
+  const { chatId } = parsePostQuery(req.query);
+  if (req.body.type === 'seen') {
+    await db.chatMembers.update({
+      latestSeen: new Date(),
+    }, {
+      where: {
+        chatId, userId: req.session.userId!,
+      }
+    });
+  }
+});
+
 export default handler;

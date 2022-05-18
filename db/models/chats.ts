@@ -40,6 +40,7 @@ export class Chat
   declare title: CreationOptional<string | null>;
   declare readonly createdAt: CreationOptional<Date>;
   declare readonly latestActivityDate: CreationOptional<Date>;
+  declare readonly unseenMessageCount: CreationOptional<number>;
 
   declare readonly members?: NonAttribute<User[]>;
   declare readonly messages?: NonAttribute<Message[]>;
@@ -63,6 +64,20 @@ export class Chat
           ) AS LatestDateSubquery
         )`),
       'latestActivityDate'
+    ];
+  }
+
+  public static projectUnseenMessageCount(sequelize: Sequelize, memberId: number): ProjectionAlias {
+    return [
+      sequelize.literal(`(
+        SELECT COUNT(*) FROM Messages M
+          WHERE M.ChatId = Chat.id
+            AND  M.createdAt > (
+            SELECT latestSeen FROM ChatMembers
+              WHERE ChatId = Chat.id AND UserId = ${ensureNumber(memberId)}
+          )
+      )`),
+      'unseenMessageCount'
     ];
   }
 
@@ -99,7 +114,10 @@ export class Chat
     `);
     return Chat.findAll({
       attributes: {
-        include: [[latestActivityDate, 'latestActivityDate']]
+        include: [
+          [latestActivityDate, 'latestActivityDate'],
+          Chat.projectUnseenMessageCount(sequelize, memberId),
+        ]
       },
       where: {
         [Op.and]: [
@@ -131,7 +149,10 @@ export class Chat
     const sequelize = Chat.sequelize!;
     return Chat.findOne({
       attributes: {
-        include: [Chat.projectLatestActivityDate(sequelize)]
+        include: [
+          Chat.projectLatestActivityDate(sequelize),
+          Chat.projectUnseenMessageCount(sequelize, memberId),
+        ]
       },
       where: {
         id: { [Op.in]: getChatIdsByMemberQuery(sequelize, memberId) }
@@ -161,6 +182,12 @@ export default function chatsModel(sequelize: Sequelize) {
       get() {
         return new Date(this.getDataValue('latestActivityDate'));
       },
+    },
+    unseenMessageCount: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.getDataValue('unseenMessageCount');
+      }
     }
   }, { sequelize });
 

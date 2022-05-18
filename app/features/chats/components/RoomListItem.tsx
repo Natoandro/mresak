@@ -12,6 +12,7 @@ export interface RoomListItemProps extends HTMLAttributes<HTMLLIElement> {
 
 export function RoomListItem({ chat, active, className, ...props }: RoomListItemProps) {
   const user = useAppSelector(selectCurrentUser)!;
+  const { unseenMessageCount } = chat;
 
   const self = useMemo(() => (
     chat.members!.find(member => member.id === user.id)!
@@ -31,8 +32,9 @@ export function RoomListItem({ chat, active, className, ...props }: RoomListItem
       const { text, senderId } = chat.latestMessage;
       return (
         <span className={clsx(
-          'text-xs truncate',
-          active || 'text-gray-500'
+          'text-xs truncate text-gray-500',
+          active || 'text-gray-500',
+          // unseenMessageCount > 0 && 'font-bold'
         )}>
           {senderId === user.id && 'You: '}{text}
         </span>
@@ -41,10 +43,18 @@ export function RoomListItem({ chat, active, className, ...props }: RoomListItem
   };
 
   return (
-    <li className={clsx('flex px-3 py-2 flex items-center select-none', className)} {...props}>
+    <li
+      className={clsx(
+        'flex px-3 py-2 flex items-center select-none',
+        unseenMessageCount > 0 && 'font-bold',
+        className
+      )}
+      {...props}
+    >
       <Avatar name={significantMember.name} className="mr-2 shrink-0 grow-0" />
       <div className="text-gray-800 flex flex-col overflow-hidden">
         <span className={clsx('text-sm truncate')}>
+          {unseenMessageCount > 0 && `(${unseenMessageCount}) `}
           {otherMembers.map(mb => mb.name).join(', ')}
         </span>
         {renderPreview()}

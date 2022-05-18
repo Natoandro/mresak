@@ -43,4 +43,6 @@ export default function chatMembersModel(sequelize: Sequelize) {
     sequelize,
     timestamps: false,
   });
+
+  return ChatMembers;
 }

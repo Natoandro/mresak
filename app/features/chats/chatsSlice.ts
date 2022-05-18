@@ -61,6 +61,9 @@ const chatsSlice = createSlice({
         messageFetchingStatus: 'idle',
       });
     },
+    messagesSeen: (state, action: PayloadAction<number>) => {
+      state.data.entities[action.payload]!.chat.unseenMessageCount = 0;
+    },
     enqueueMessage: (state, action: PayloadAction<MessageCreationAttributes>) => {
       const localState = selectById(state.data, action.payload.chatId)!;
       chatsAdapter.updateOne(state.data, {
@@ -98,7 +101,7 @@ const chatsSlice = createSlice({
 });
 
 export const {
-  chatAdded,
+  chatAdded, messagesSeen,
   enqueueMessage, messageSent,
   setSendingStatus,
 } = chatsSlice.actions;
@@ -117,8 +120,9 @@ export const selectChats = createSelector(
   (all) => all.map(cs => cs.chat)
 );
 
-export const selectChat = (state: RootState, chatId: number) => (
-  selectById(state.chats.data, chatId)
+export const selectChat = createSelector(
+  selectChatState,
+  (cs) => cs?.chat
 );
 
 export const selectMessageLoadingStatus = createSelector(
