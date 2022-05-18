@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
-import { HTMLAttributes, ReactNode } from 'react';
+import { HTMLAttributes } from 'react';
 import { selectIsReady, selectChats } from '~/app/features/chats/chatsSlice';
 import { useAppSelector } from '~/app/hooks';
-import { useCurrentUser } from '../../users/contexts/CurrentUser';
+import { selectCurrentUser } from '@/users/userSlice';
 import useActiveChatId from '../hooks/useActiveChatId';
 import { RoomListItem } from './RoomListItem';
 
@@ -11,7 +11,7 @@ export interface RoomListProps extends HTMLAttributes<HTMLDivElement> { }
 
 export default function RoomList({ className, ...props }: RoomListProps) {
   const router = useRouter();
-  const user = useCurrentUser();
+  const user = useAppSelector(selectCurrentUser);
   const activeChatId = useActiveChatId();
   //* room list items requires user to be not null
   const isReady = useAppSelector(selectIsReady) && user != null;

@@ -3,12 +3,13 @@ import { HTMLAttributes, useMemo } from 'react';
 import LettersAvatar from '~/app/commons/components/LettersAvatar';
 import TextSkeleton from '~/app/commons/components/TextSkeleton';
 import { getInitials } from '~/app/commons/lib/utils/string';
-import { useCurrentUser } from '../contexts/CurrentUser';
+import { useAppSelector } from '~/app/hooks';
+import { selectCurrentUser } from '../userSlice';
 
 export interface CurrentUserViewProps extends HTMLAttributes<HTMLDivElement> { }
 
 export default function CurrentUserView({ className, ...props }: CurrentUserViewProps) {
-  const user = useCurrentUser();
+  const user = useAppSelector(selectCurrentUser);
 
   const name = user?.name;
   const initials = useMemo(() => (

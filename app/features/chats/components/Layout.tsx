@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import Image from 'next/image';
 import { HTMLAttributes, PropsWithChildren, ReactNode } from 'react';
-import UserListItem from '~/components/users/UserListItem';
-import { useCurrentUser } from '@/users/contexts/CurrentUser';
-import CurrentUserView from '../../users/components/CurrentUserView';
+import CurrentUserView from '@/users/components/CurrentUserView';
+import { selectCurrentUser } from '@/users/userSlice';
+import { useAppSelector } from '~/app/hooks';
 
 export type ChatPageLayoutProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   actions?: ReactNode;
@@ -12,7 +12,7 @@ export type ChatPageLayoutProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
 export default function ChatPageLayout(
   { actions, children, className, ...props }: ChatPageLayoutProps
 ) {
-  const user = useCurrentUser();
+  const user = useAppSelector(selectCurrentUser);
   return (
     <div className="h-screen flex flex-col relative bg-slate-100">
       <header className="shadow-z1 h-12 flex justify-center bg-blue-100 z-10">

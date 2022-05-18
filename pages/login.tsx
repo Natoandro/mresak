@@ -3,11 +3,13 @@ import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import CurrentUserContext from '~/app/features/users/contexts/CurrentUser';
+import { setUser } from '@/users/userSlice';
+import { useAppDispatch } from '~/app/hooks';
 import Button from '~/components/common/Button';
 import FormCard from '~/components/common/FormCard';
 import FormField from '~/components/common/FormField';
 import { UserAttributes } from '~/db/models/users';
+import { getSession, Session } from '~/lib/session';
 
 
 
@@ -16,30 +18,28 @@ interface FieldValues {
   password: string;
 }
 
-interface LoginResult {
-  passwordResetRequired: boolean;
-}
-
 const LoginPage: NextPage = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const { register, handleSubmit, watch } = useForm<FieldValues>();
   const login = watch('login');
   const password = watch('password');
 
-  const { setUser } = useContext(CurrentUserContext);
+  const { next = '/' } = router.query as { next?: string; };
 
   // TODO: handle invalid password
   const [passwordIsInvalid, setPasswordIsInvalid] = useState(false);
   const onSubmit = async (data: FieldValues) => {
     try {
       const res = await axios.post<UserAttributes>('/api/login', data);
-      setUser(res.data);
+      dispatch(setUser(res.data));
       const { passwordResetRequired } = res.data;
       if (passwordResetRequired) {
-        await router.replace('/me/password-reset');
+        const usp = new URLSearchParams({ next });
+        await router.replace(`/me/password-reset?${usp.toString()}`);
       } else {
-        await router.replace('/');
+        await router.replace(next);
       }
     } catch (err) {
       setPasswordIsInvalid(true);
@@ -82,8 +82,18 @@ const LoginPage: NextPage = () => {
 export default LoginPage;
 
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res, query }) => {
+  const session: Session = await getSession(req, res);
+  if (session.userId == null) {
+    return {
+      props: {}
+    };
+  }
+  const { next = '/' } = query as { next?: string; };
   return {
-    props: {}
+    redirect: {
+      destination: next,
+      permanent: false,
+    }
   };
 };

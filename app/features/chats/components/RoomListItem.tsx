@@ -2,14 +2,15 @@ import clsx from 'clsx';
 import { HTMLAttributes, useMemo } from 'react';
 import { ChatAttributes } from '~/db/models/chats';
 import Avatar from '~/components/users/Avatar';
-import { useCurrentUser } from '../../users/contexts/CurrentUser';
+import { useAppSelector } from '~/app/hooks';
+import { selectCurrentUser } from '@/users/userSlice';
 
 export interface RoomListItemProps extends HTMLAttributes<HTMLLIElement> {
   chat: ChatAttributes;
 }
 
 export function RoomListItem({ chat, className, ...props }: RoomListItemProps) {
-  const user = useCurrentUser()!;
+  const user = useAppSelector(selectCurrentUser)!;
 
   const self = useMemo(() => (
     chat.members!.find(member => member.id === user.id)!

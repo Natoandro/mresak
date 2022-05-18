@@ -1,6 +1,6 @@
 import { forwardRef, HTMLAttributes, KeyboardEvent, useImperativeHandle, useRef, useState } from 'react';
-import { useAppDispatch } from '~/app/hooks';
-import { useCurrentUser } from '../../users/contexts/CurrentUser';
+import { useAppDispatch, useAppSelector } from '~/app/hooks';
+import { selectCurrentUser } from '@/users/userSlice';
 import { enqueueMessage } from '../chatsSlice';
 import useActiveChatId from '../hooks/useActiveChatId';
 
@@ -13,7 +13,7 @@ interface MessageInputProps extends HTMLAttributes<HTMLDivElement> { }
 export default forwardRef<MessageInputRef, MessageInputProps>(
   function MessageInput(props, ref) {
     const dispatch = useAppDispatch();
-    const user = useCurrentUser();
+    const user = useAppSelector(selectCurrentUser);
     const activeChatId = useActiveChatId();
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
