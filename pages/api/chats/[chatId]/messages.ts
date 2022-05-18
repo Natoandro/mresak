@@ -55,7 +55,17 @@ handler.post<PostReqExt>(async (req, res) => {
   const senderId = req.session.userId!;
   const { text } = req.body;
 
-  const msg = await db.messages.create({ chatId, senderId, text });
+  const msg = await db.sequelize.transaction(async (transaction) => {
+    const msg = await db.messages.create({ chatId, senderId, text }, {
+      transaction
+    });
+    await db.chatMembers.update({ latestSeen: msg.createdAt }, {
+      where: { chatId, userId: senderId },
+      transaction
+    });
+    return msg;
+  });
+
   res.status(200).json({
     id: msg.id,
     chatId,
