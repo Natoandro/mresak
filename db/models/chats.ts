@@ -16,12 +16,13 @@ import {
 import { NextSerializable, Writable } from '~/lib/types';
 import ensureNumber from '~/lib/utils/ensureNumber';
 import { ChatMembers } from './chatMembers';
-import { Message } from './messages';
+import { Message, MessageAttributes } from './messages';
 import { User, UserAsChatMemberAttributes } from './users';
 
 
 export interface ChatAttributes extends NextSerializable<Attributes<Chat>> {
-  readonly members?: UserAsChatMemberAttributes[];
+  members?: UserAsChatMemberAttributes[];
+  latestMessage: MessageAttributes | null;
 }
 
 
@@ -41,6 +42,7 @@ export class Chat
   declare readonly latestActivityDate: CreationOptional<Date>;
 
   declare readonly members?: NonAttribute<User[]>;
+  declare readonly messages?: NonAttribute<Message[]>;
 
   declare getMembers: HasManyGetAssociationsMixin<User>;
   declare addMember: HasManyAddAssociationMixin<User, number>;
@@ -67,7 +69,9 @@ export class Chat
   public toJSON(): ChatAttributes {
     const obj = super.toJSON() as unknown as Writable<ChatAttributes>;
     obj.createdAt = Number(obj.createdAt);
+    obj.latestMessage = this.messages?.[0]?.toJSON() ?? null;
     obj.latestActivityDate = Number(obj.latestActivityDate);
+    delete (obj as any).messages;
     delete (obj as any).updatedAt;
     if (this.members) {
       obj.members = this.members.map(m => m.toJsonAsChatMember());
@@ -88,20 +92,47 @@ export class Chat
 
   public static async findAllByMember(memberId: number): Promise<Chat[]> {
     const sequelize = Chat.sequelize!;
+    const latestActivityDate = sequelize.literal(`
+      CASE WHEN messages.createdAt IS NULL THEN Chat.createdAt
+                ELSE messages.createdAt
+            END
+    `);
     return Chat.findAll({
-      where: {
-        id: {
-          [Op.in]: getChatIdsByMemberQuery(sequelize, memberId),
-        }
+      attributes: {
+        include: [[latestActivityDate, 'latestActivityDate']]
       },
-      include: [Chat.associations.members],
+      where: {
+        [Op.and]: [
+          { id: { [Op.in]: getChatIdsByMemberQuery(sequelize, memberId) } },
+          sequelize.where(Chat.queryLatestMessageIdByChat, {
+            [Op.or]: [
+              { [Op.is]: null },
+              { [Op.col]: 'messages.id' }
+            ]
+          })
+        ],
+      },
+      include: [Chat.associations.members, Chat.associations.messages],
       order: [[sequelize.literal('latestActivityDate'), 'DESC']],
     });
+  }
+
+  private static get queryLatestMessageIdByChat() {
+    return Chat.sequelize!.literal(`(
+      SELECT M.id
+        FROM Messages AS M
+        WHERE M.ChatId = Chat.id
+        ORDER BY M.createdAt DESC
+        LIMIT 1
+    )`);
   }
 
   public static async findLatestByMember(memberId: number): Promise<Chat | null> {
     const sequelize = Chat.sequelize!;
     return Chat.findOne({
+      attributes: {
+        include: [Chat.projectLatestActivityDate(sequelize)]
+      },
       where: {
         id: { [Op.in]: getChatIdsByMemberQuery(sequelize, memberId) }
       },
@@ -131,14 +162,7 @@ export default function chatsModel(sequelize: Sequelize) {
         return new Date(this.getDataValue('latestActivityDate'));
       },
     }
-  }, {
-    sequelize,
-    defaultScope: {
-      attributes: {
-        include: [Chat.projectLatestActivityDate(sequelize)]
-      }
-    }
-  });
+  }, { sequelize });
 
   Chat.belongsToMany(User, { through: ChatMembers, as: 'members' });
   User.belongsToMany(Chat, { through: ChatMembers });

@@ -10,7 +10,7 @@ import {
   CreationAttributes,
   NonAttribute
 } from 'sequelize';
-import { NextSerializable } from '~/lib/types';
+import { NextSerializable, Writable } from '~/lib/types';
 import { Chat } from './chats';
 import { User } from './users';
 
@@ -26,6 +26,12 @@ export class Message
   declare readonly senderId: ForeignKey<number>;
   declare readonly text: string;
   declare readonly createdAt: CreationOptional<Date>;
+
+  public toJSON(): MessageAttributes {
+    const obj = super.toJSON() as unknown as Writable<MessageAttributes>;
+    obj.createdAt = Number(obj.createdAt);
+    return obj;
+  }
 
   static findInChat(
     chatId: number, filter: MessageFilter, count = 20
@@ -67,7 +73,8 @@ export default function messagesModel(sequelize: Sequelize) {
     foreignKey: {
       name: 'chatId',
       allowNull: false,
-    }
+    },
+    as: 'messages',
   });
 
   Message.belongsTo(User, { as: 'sender' });
