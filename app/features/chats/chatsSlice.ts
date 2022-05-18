@@ -76,8 +76,13 @@ const chatsSlice = createSlice({
     messageSent: (state, action: PayloadAction<MessageMeta>) => {
       const localState = selectById(state.data, action.payload.chatId)!;
       const [front, ...queue] = localState.queue;
-      const messages = [...localState.messages, { ...front, ...action.payload }];
-      const chat: ChatAttributes = { ...localState.chat, latestActivityDate: action.payload.createdAt };
+      const newMessage = { ...front, ...action.payload };
+      const messages = [...localState.messages, newMessage];
+      const chat: ChatAttributes = {
+        ...localState.chat,
+        latestActivityDate: action.payload.createdAt,
+        latestMessage: newMessage,
+      };
       chatsAdapter.updateOne(state.data, {
         id: action.payload.chatId,
         changes: { queue, messages, chat },
