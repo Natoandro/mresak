@@ -28,7 +28,7 @@ export default function RoomList({ className, ...props }: RoomListProps) {
     <div className={clsx('p-1 border-r border-gray-300 overflow-y-auto', className)} {...props}>
       {isReady && chats.map((chat) => (
         <RoomListItem
-          key={chat.id} chat={chat}
+          key={chat.id} chat={chat} active={chat.id === activeChatId}
           className={clsx(
             'hover:bg-slate-100 m-1 rounded-md cursor-default',
             chat.id === activeChatId && 'bg-violet-200 hover:bg-violet-200',
