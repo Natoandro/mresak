@@ -1,9 +1,7 @@
 import {
-  createAsyncThunk,
   createEntityAdapter,
   createSelector,
   createSlice,
-  EntityState,
   PayloadAction
 } from '@reduxjs/toolkit';
 import { RootState } from '~/app/store';
@@ -11,6 +9,7 @@ import { ChatAttributes } from '~/db/models/chats';
 import { MessageAttributes, MessageCreationAttributes } from '~/db/models/messages';
 import { fetchChatRoomsReducers } from './fetchChatRooms';
 import { fetchMessagesReducers } from './fetchMessages';
+import { fetchUpdatesReducers } from './fetchUpdates';
 
 export type SendingStatus = 'idle' | 'active' | 'error';
 
@@ -44,6 +43,10 @@ interface SetSendingStatusPayload {
 const initialState = {
   data: chatsAdapter.getInitialState(),
   loading: 'idle' as LoadingState,
+  updates: {
+    currentVersion: 0, // timestamp
+    status: 'idle' as LoadingState,
+  }
 };
 
 export type SliceState = typeof initialState;
@@ -102,6 +105,7 @@ const chatsSlice = createSlice({
   extraReducers: (builder) => {
     fetchChatRoomsReducers(builder);
     fetchMessagesReducers(builder);
+    fetchUpdatesReducers(builder);
   }
 });
 
@@ -145,5 +149,7 @@ export const selectAllMessages = createSelector(
     } as MessageAttributes))
   ]
 );
+
+export const selectUpdatesStatus = (state: RootState) => state.chats.updates.status;
 
 export default chatsSlice.reducer;

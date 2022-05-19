@@ -34,7 +34,6 @@ export const fetchMessagesReducers = (builder: ActionReducerMapBuilder<SliceStat
   });
 
   builder.addCase(fetchMessages.fulfilled, (state, action) => {
-    console.log('fetchMessages/fulfilled', action);
     const localState = state.data.entities[action.meta.arg]!;
     localState.messages.unshift(...action.payload);
     localState.messageFetchingStatus = 'success';

@@ -20,7 +20,7 @@ import { Message, MessageAttributes } from './messages';
 import { User, UserAsChatMemberAttributes } from './users';
 
 
-export interface ChatAttributes extends NextSerializable<Attributes<Chat>> {
+export interface ChatAttributes extends Writable<NextSerializable<Attributes<Chat>>> {
   members?: UserAsChatMemberAttributes[];
   latestMessage: MessageAttributes | null;
 }

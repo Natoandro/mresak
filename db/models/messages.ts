@@ -8,14 +8,16 @@ import {
   CreationOptional,
   Attributes,
   CreationAttributes,
-  NonAttribute
+  NonAttribute,
+  Op
 } from 'sequelize';
 import { NextSerializable, Writable } from '~/lib/types';
+import ensureNumber from '~/lib/utils/ensureNumber';
 import { Chat } from './chats';
 import { User } from './users';
 
 export interface MessageFilter {
-  priorTo?: Date;
+  since: Date;
 }
 
 export class Message
@@ -30,6 +32,7 @@ export class Message
   public toJSON(): MessageAttributes {
     const obj = super.toJSON() as unknown as Writable<MessageAttributes>;
     obj.createdAt = Number(obj.createdAt);
+    delete (obj as any).updatedAt;
     return obj;
   }
 
@@ -43,6 +46,26 @@ export class Message
       },
       order: [['createdAt', 'ASC']],
     });
+  }
+
+  static async findAllByUser(
+    userId: number, { since }: MessageFilter
+  ): Promise<MessageAttributes[]> {
+    const sequelize = Chat.sequelize!;
+    return (await Message.findAll({
+      where: {
+        senderId: { [Op.ne]: userId },
+        createdAt: { [Op.gt]: since },
+        [Op.and]: sequelize.where(
+          //* this could be a simple inner join 
+          sequelize.literal(`(
+            SELECT COUNT(*) FROM ChatMembers
+              WHERE ChatMembers.chatId = Message.ChatId AND userId = ${ensureNumber(userId)}
+          )`), { [Op.eq]: 1 }
+        )
+      },
+      order: ['createdAt']
+    })).map((msg) => msg.toJSON());
   }
 }
 

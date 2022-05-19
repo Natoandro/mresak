@@ -1,4 +1,4 @@
-import { ActionReducerMapBuilder, createAsyncThunk, EntityState } from '@reduxjs/toolkit';
+import { ActionReducerMapBuilder, createAsyncThunk, } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { ChatAttributes } from '~/db/models/chats';
 import { chatsAdapter, SliceState } from './chatsSlice';
@@ -29,6 +29,11 @@ export const fetchChatRoomsReducers = (
         messageFetchingStatus: 'idle',
       })));
       state.loading = 'success';
+      const topId = state.data.ids[0];
+      if (topId != null) {
+        const top = state.data.entities[topId];
+        state.updates.currentVersion = top?.chat.latestActivityDate ?? 0;
+      }
     })
     .addCase(fetchChatRooms.rejected, (state, action) => {
       state.loading = 'error';

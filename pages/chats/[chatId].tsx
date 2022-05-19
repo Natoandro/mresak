@@ -13,6 +13,7 @@ import { UserAttributes } from '~/db/models/users';
 import useActiveChatId from '~/app/features/chats/hooks/useActiveChatId';
 import useFetchChatRooms from '~/app/features/chats/hooks/useFetchChatRooms';
 import useSetSeen from '~/app/features/chats/hooks/useSetSeen';
+import useFetchUpdates from '~/app/features/chats/hooks/useFetchUpdates';
 
 
 interface ActionsProps {
@@ -59,6 +60,7 @@ export default function ChatPage() {
 
   useFetchChatRooms();
   useSetSeen();
+  useFetchUpdates();
 
   return (
     <Layout actions={<Actions onRecipientSelect={handleRecipientSelect} />} className="flex" >
