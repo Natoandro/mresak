@@ -31,7 +31,7 @@ export default function Messages({ className, ...props }: MessagesProps) {
   // TODO: skeleton??
   return (
     <div className={clsx('flex flex-col', className)} {...props}>
-      <main className="grow flex flex-col space-y-2 py-2">
+      <main className="grow shrink overflow-y-auto flex flex-col space-y-2 py-2">
         <div className="grow" />
         {isReady && (
           <MessageList />
